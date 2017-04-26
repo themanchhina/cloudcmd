@@ -27,14 +27,14 @@
         "remote": "https://cdnjs.cloudflare.com/ajax/libs/socket.io/{{ version }}/socket.io.js"
     }, {
         "name": "fancybox",
-        "version": "2.1.6",
+        "version": "3.0.47",
         "local": [
-            "/modules/fancybox/source/jquery.fancybox.css",
-            "/modules/fancybox/source/jquery.fancybox.pack.js"
+            "/modules/fancybox/dist/jquery.fancybox.min.css",
+            "/modules/fancybox/dist/jquery.fancybox.min.js"
         ],
         "remote": [
-            "//cdnjs.cloudflare.com/ajax/libs/fancybox/{{ version }}/css/jquery.fancybox.min.css",
-            "//cdnjs.cloudflare.com/ajax/libs/fancybox/{{ version }}/js/jquery.fancybox.min.js"
+            "//cdnjs.cloudflare.com/ajax/libs/fancybox/{{ version }}/jquery.fancybox.min.css",
+            "//cdnjs.cloudflare.com/ajax/libs/fancybox/{{ version }}/jquery.fancybox.min.js"
         ]
     }, {
         "name": "menu",

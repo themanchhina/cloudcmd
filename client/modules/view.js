@@ -106,7 +106,7 @@ function show(data, options) {
     
     if (data) {
         const element = $(El).append(data);
-        $.fancybox(element, initConfig(Config, options));
+        $.fancybox.open(element.html(), initConfig(Config, options));
         return;
     }
     
@@ -122,6 +122,7 @@ function show(data, options) {
                 return Images.hide();
             
             const element = document.createTextNode(data);
+            console.log('???');
             /* add margin only for view text documents */
             El.css('margin', '2%');
             
@@ -323,24 +324,17 @@ function loadAll(callback) {
         const {PREFIX} = CloudCmd;
         
         load.css(PREFIX + '/css/view.css', callback);
-        
-        load.style({
-            id      : 'view-inlince-css',
-            inner   : [
-                '.fancybox-title-float-wrap .child {',
-                '-webkit-border-radius: 0;',
-                '-moz-border-radius: 0;',
-                'border-radius: 0;',
-                '}'
-            ].join('')
-        });
     });
 }
 
 function onOverLayClick(event) {
-    const files = Info.files;
-    const filesPassive = Info.filesPassive;
     const {target} = event;
+    
+    const {
+        files,
+        filesPassive,
+    } = Info;
+    
     const isOverlay = target === Overlay;
     const position = {
         x: event.clientX,
