@@ -44,6 +44,7 @@ const args = require('minimist')(argv.slice(2), {
         'one-panel-mode',
         'html-dialogs',
         'show-config',
+        'keys-panel',
     ],
     default: {
         server      : true,
@@ -65,7 +66,8 @@ const args = require('minimist')(argv.slice(2), {
         'terminal-path': env('terminal_path') || config('terminalPath'),
         'config-dialog': choose(env.bool('config_dialog'), config('configDialog')),
         'one-panel-mode': config('onePanelMode'),
-        'html-dialogs': config('htmlDialogs')
+        'html-dialogs': config('htmlDialogs'),
+        'keys-panel': env.bool('keys_panel') || config('keysPanel'),
     },
     alias: {
         v: 'version',
@@ -112,6 +114,8 @@ function main() {
     config('htmlDialogs', args['html-dialogs']);
     config('onePanelMode', args['one-panel-mode']);
     config('configDialog', args['config-dialog']);
+    config('keysPanel', args['keys-panel']);
+    console.log(config('keysPanel'));
     
     readConfig(args.config);
     

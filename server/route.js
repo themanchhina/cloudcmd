@@ -64,7 +64,7 @@ function indexProcessing(options) {
     
     let from;
     let to;
-    if (!config('showKeysPanel')) {
+    if (!config('keysPanel')) {
         from = rendy(keysPanel, {
             className: 'keyspanel'
         });
