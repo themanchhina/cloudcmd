@@ -1,4 +1,4 @@
-/* global CloudCmd, filepicker */
+/* global CloudCmd, filestack */
 
 'use strict';
 
@@ -6,6 +6,10 @@ CloudCmd.Cloud = CloudProto;
 
 const exec = require('execon');
 const {log} = CloudCmd;
+
+const fullstore = require('fullstore/legacy');
+const squad = require('squad');
+const currify = require('currify');
 
 const load = require('../dom/load');
 const Files = require('../dom/files');
@@ -15,6 +19,19 @@ const {
     timeEnd,
 } = require('../../common/util');
 
+const upload = currify(_upload);
+const getFilesUploaded = ({filesUploaded}) => filesUploaded;
+const map = currify((fn, items) => items.map(fn));
+
+const uploadToServer = currify((fn, res) => {
+    const uploadAll = map(upload(fn));
+    const process = squad(uploadAll, getFilesUploaded, log)
+    
+    return process(res);
+});
+
+const FSClient = fullstore();
+
 function CloudProto(callback) {
     loadFiles(callback);
     
@@ -23,6 +40,7 @@ function CloudProto(callback) {
 
 module.exports.uploadFile = (filename, data) => {
     const mimetype = '';
+    const fsClient = FSClient();
     
     filepicker.store(data, {
         mimetype,
@@ -34,29 +52,49 @@ module.exports.uploadFile = (filename, data) => {
 };
 
 module.exports.saveFile = (callback) => {
-    filepicker.pick((fpFile) => {
-        log(fpFile);
-        
-        const {url} = fpFile;
-        const responseType = 'arraybuffer';
-        const success = exec.with(callback, fpFile.filename);
-        
-        load.ajax({
-            url,
-            responseType,
-            success,
-        });
-    });
+    const fsClient = FSClient();
+    const fromSources = [
+        'local_file_system',
+        'imagesearch',
+        'googledrive',
+        'dropbox',
+        'box',
+        'github',
+        'gmail',
+        'onedrive',
+        'clouddrive',
+        'customsource',
+    ]
+    
+    fsClient.pick({fromSources})
+        .then(uploadToServer(callback));
 };
+
+function _upload(callback, file) {
+    const {
+        url,
+        filename,
+    } = file;
+    
+    const responseType = 'arraybuffer';
+    const success = exec.with(callback, filename);
+    
+    load.ajax({
+        url,
+        responseType,
+        success,
+    });
+}
 
 function loadFiles(callback) {
     time('filepicker load');
+    const js = 'https://static.filestackapi.com/v3/filestack.js';
     
-    load.js('//api.filepicker.io/v1/filepicker.js', () => {
+    load.js(js, () => {
         Files.get('modules', (error, modules) => {
             const {key} = modules.data.FilePicker;
             
-            filepicker.setKey(key);
+            FSClient(filestack.init(key));
             
             Images.hide();
             timeEnd('filepicker loaded');
