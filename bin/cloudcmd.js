@@ -45,7 +45,7 @@ const args = require('minimist')(argv.slice(2), {
         'sync-console-path',
         'contact',
         'terminal',
-        'one-panel-mode',
+        'one-panel',
         'confirm-copy',
         'confirm-move',
         'html-dialogs',
@@ -75,7 +75,7 @@ const args = require('minimist')(argv.slice(2), {
         'sync-console-path': choose(env.bool('sync_console_path'), config('syncConsolePath')),
         'config-dialog': choose(env.bool('config_dialog'), config('configDialog')),
         'terminal-path': env('terminal_path') || config('terminalPath'),
-        'one-panel-mode': choose(env.bool('one_panel_mode'), config('onePanelMode')),
+        'one-panel': choose(env.bool('one_panel'), config('onePanel')),
         'confirm-copy': choose(env.bool('confirm_copy'), config('confirmCopy')),
         'confirm-move': choose(env.bool('confirm_move'), config('confirmMove')),
         'html-dialogs': config('htmlDialogs'),
@@ -133,7 +133,7 @@ function main() {
     config('htmlDialogs', args['html-dialogs']);
     config('confirmCopy', args['confirm-copy']);
     config('confirmMove', args['confirm-move']);
-    config('onePanelMode', args['one-panel-mode']);
+    config('onePanel', args['one-panel']);
     config('configDialog', args['config-dialog']);
     config('keysPanel', args['keys-panel']);
     
