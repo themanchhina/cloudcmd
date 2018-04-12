@@ -367,7 +367,7 @@ Here is description of options:
     "dirStorage"        : true,     /* store directory listing to localStorage  */
     "online"            : true,     /* load js files from cdn or local path     */
     "open"              : false     /* open web browser when server started     */
-    "cache"             : true,     /* enable cache                             */
+    "cache"             : false,    /* enable cache                             */
     "keysPanel"         : true,     /* show classic panel with buttons of keys  */
     "port"              : 8000,     /* http port                                */
     "ip"                : null,     /* ip or null(default)                      */
