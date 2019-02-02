@@ -25,9 +25,10 @@ module.exports = (name, options, callback = options) => {
         const module = findObjByNameInArr(modules.remote, name);
         
         const isArray = itype.array(module.local);
-        const version = module.version;
+        const {version} = module;
         
-        let remoteTmpls, local;
+        let remoteTmpls;
+        let local;
         if (isArray) {
             remoteTmpls = module.remote;
             local       = module.local;
@@ -42,7 +43,7 @@ module.exports = (name, options, callback = options) => {
         
         const remoteURL = remoteTmpls.map((tmpl) => {
             return rendy(tmpl, {
-                version: version
+                version,
             });
         });
         

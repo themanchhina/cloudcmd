@@ -23,6 +23,7 @@ const currify = require('currify');
 const apart = require('apart');
 const ponse = require('ponse');
 const restafary = require('restafary');
+const restbox = require('restbox');
 const konsole = require('console-io');
 const edward = require('edward');
 const dword = require('dword');
@@ -164,38 +165,44 @@ function cloudcmd(prefix, plugins, modules) {
     const dir = DIR_ROOT;
     
     const ponseStatic = ponse.static(dir, {cache});
+    
+    const dropbox = config('dropbox');
+    const dropboxToken = config('dropboxToken');
    
     const funcs = clean([
         config('console') && konsole({
             online,
         }),
         
-        config('terminal') && terminal({
-        }),
+        config('terminal') && terminal({}),
         
         edward({
             online,
             diff,
             zip,
+            dropbox,
+            dropboxToken,
         }),
        
         dword({
             online,
             diff,
             zip,
+            dropbox,
+            dropboxToken,
         }),
         
         deepword({
             online,
             diff,
             zip,
+            dropbox,
+            dropboxToken,
         }),
         
-        fileop({
-        }),
+        fileop(),
         
-        nomine({
-        }),
+        nomine(),
         
         setUrl,
         setSW,
@@ -205,18 +212,24 @@ function cloudcmd(prefix, plugins, modules) {
         
         modules && modulas(modules),
         
+        config('dropbox') && restbox({
+            prefix: cloudfunc.apiURL,
+            root,
+            token: dropboxToken,
+        }),
+        
         restafary({
             prefix: cloudfunc.apiURL + '/fs',
-            root
+            root,
         }),
         
         rest,
         route({
-            html: defaultHtml
+            html: defaultHtml,
         }),
         
         pluginer(plugins),
-        ponseStatic
+        ponseStatic,
     ]);
     
     return funcs;

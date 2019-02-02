@@ -1,26 +1,22 @@
 'use strict';
 
-const test = require('tape');
+const test = require('supertape');
 const {promisify} = require('util');
 const tryToCatch = require('try-to-catch');
-const io = require('socket.io-client');
-const mockRequire = require('mock-require');
-
 const {connect} = require('../../test/before');
-
 const config = require('../config');
 const distribute = {
     import: promisify(require('./import')),
 };
 
 test('distribute: import: canceled', async (t) => {
-    const {done, port} = await connect({
+    const {done} = await connect({
         config: {
             export: false,
             import: false,
             importListen: false,
             log: false,
-        }
+        },
     });
     
     const {status} = await distribute.import();
@@ -38,7 +34,7 @@ test('distribute: import: received: no error', async (t) => {
             importListen: false,
             export: true,
             log: false,
-        }
+        },
     });
     
     config('importUrl', `http://localhost:${port}`);
@@ -61,7 +57,7 @@ test('distribute: import: received', async (t) => {
             export: true,
             importListen: false,
             log: false,
-        }
+        },
     });
     
     config('importUrl', `http://localhost:${port}`);
@@ -83,7 +79,7 @@ test('distribute: import: received: auth: reject', async (t) => {
             export: true,
             importListen: false,
             log: false,
-        }
+        },
     });
     
     config('importUrl', `http://localhost:${port}`);
@@ -105,7 +101,7 @@ test('distribute: import: received: auth: accept', async (t) => {
             export: true,
             importListen: false,
             log: false,
-        }
+        },
     });
     
     config('importUrl', `http://localhost:${port}`);
@@ -125,7 +121,7 @@ test('distribute: import: received: no name', async (t) => {
             export: true,
             importListen: false,
             log: false,
-        }
+        },
     });
     
     config('importUrl', `http://localhost:${port}`);
@@ -138,13 +134,13 @@ test('distribute: import: received: no name', async (t) => {
 });
 
 test('distribute: import: error', async (t) => {
-    const {done, port} = await connect({
+    const {done} = await connect({
         config: {
             import: true,
             export: false,
             importListen: false,
             log: false,
-        }
+        },
     });
     
     config('importUrl', `http://localhost:0`);
@@ -160,13 +156,13 @@ test('distribute: import: error', async (t) => {
 });
 
 test('distribute: import: config:change: no export', async (t) => {
-    const {done, port} = await connect({
+    const {done} = await connect({
         config: {
             import: true,
             export: false,
             importListen: true,
             log: false,
-        }
+        },
     });
     
     const {status} = await distribute.import({

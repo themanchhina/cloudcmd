@@ -6,9 +6,7 @@ const {
     join,
 } = require('path');
 
-const {
-    EnvironmentPlugin,
-} = require('webpack');
+const {EnvironmentPlugin} = require('webpack');
 
 const ServiceWorkerWebpackPlugin = require('serviceworker-webpack-plugin');
 
@@ -34,7 +32,7 @@ const babelDev = {
     plugins: [
         'module:babel-plugin-macros',
         '@babel/plugin-proposal-object-rest-spread',
-    ]
+    ],
 };
 
 const rules = clean([
@@ -47,11 +45,14 @@ const rules = clean([
         test: /sw\.js$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
-        options: babelDev
+        options: babelDev,
     }]);
 
 const plugins = [
-    new EnvironmentPlugin(['NODE_ENV']),
+    new EnvironmentPlugin({
+        NODE_ENV: 'production',
+    }),
+    
     new ServiceWorkerWebpackPlugin({
         entry: join(__dirname, '..', 'client', 'sw', 'sw.js'),
         excludes: ['*'],
@@ -65,7 +66,7 @@ const splitChunks = {
 
 module.exports = {
     resolve: {
-        symlinks: false
+        symlinks: false,
     },
     devtool,
     optimization: {
@@ -99,13 +100,17 @@ module.exports = {
         publicPath: '/dist/',
     },
     externals: [
-        externals
+        externals,
     ],
     module: {
         rules,
         noParse,
     },
     plugins,
+    performance: {
+        maxEntrypointSize: 500000,
+        maxAssetSize: 500000,
+    },
 };
 
 function externals(context, request, fn) {

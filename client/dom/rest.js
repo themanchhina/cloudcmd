@@ -5,9 +5,7 @@
 const itype = require('itype/legacy');
 
 const {FS} = require('../../common/cloudfunc');
-const {
-    encode,
-} = require('../../common/entity');
+const {encode} = require('../../common/entity');
 
 module.exports = new RESTful();
 
@@ -28,7 +26,7 @@ function RESTful() {
             url         : FS + url,
             data,
             callback,
-            imgPosition : { top: !!data }
+            imgPosition : { top: !!data },
         });
     };
     
@@ -41,7 +39,7 @@ function RESTful() {
         }
         
         const imgPosition = {
-            top: true
+            top: true,
         };
         
         sendRequest({
@@ -66,7 +64,7 @@ function RESTful() {
             url: FS + url,
             data,
             callback,
-            imgPosition : { top: true }
+            imgPosition : { top: true },
         });
     };
     
@@ -97,7 +95,7 @@ function RESTful() {
             url: '/cp',
             data,
             callback,
-            imgPosition : { top: true }
+            imgPosition : { top: true },
         });
     };
     
@@ -114,8 +112,8 @@ function RESTful() {
         sendRequest({
             method      : 'PUT',
             url         : '/extract',
-            data        : data,
-            callback    : callback
+            data,
+            callback,
         });
     };
     
@@ -123,55 +121,55 @@ function RESTful() {
         sendRequest({
             method      : 'PUT',
             url         : '/mv',
-            data        : data,
-            callback    : callback,
-            imgPosition : { top: true }
+            data,
+            callback,
+            imgPosition : { top: true },
         });
     };
     
     this.Config = {
-        read:   function(callback) {
+        read(callback) {
             sendRequest({
                 method      : 'GET',
                 url         : '/config',
-                callback    : callback,
+                callback,
                 imgPosition : { top: true },
-                notLog      : true
+                notLog      : true,
             });
         },
         
-        write:  function(data, callback) {
+        write(data, callback) {
             sendRequest({
                 method      : 'PATCH',
                 url         : '/config',
-                data        : data,
-                callback    : callback,
-                imgPosition : { top: true }
+                data,
+                callback,
+                imgPosition : { top: true },
             });
-        }
+        },
     };
     
     this.Markdown   = {
-        read    : function(url, callback) {
+        read(url, callback) {
             sendRequest({
                 method      : 'GET',
                 url         : '/markdown' + url,
-                callback    : callback,
+                callback,
                 imgPosition : { top: true },
-                notLog      : true
+                notLog      : true,
             });
         },
         
-        render  : function(data, callback) {
+        render(data, callback) {
             sendRequest({
                 method      : 'PUT',
                 url         : '/markdown',
-                data        : data,
-                callback    : callback,
+                data,
+                callback,
                 imgPosition : { top: true },
-                notLog      : true
+                notLog      : true,
             });
-        }
+        },
     };
     
     function sendRequest(params) {
@@ -194,8 +192,12 @@ function RESTful() {
             dataType    : p.dataType,
             error       : (jqXHR) => {
                 const response = jqXHR.responseText;
-                const statusText = jqXHR.statusText;
-                const status = jqXHR.status;
+                
+                const {
+                    statusText,
+                    status,
+                } = jqXHR;
+                
                 const text = status === 404 ? response : statusText;
                 const encoded = encode(text);
                 
@@ -214,7 +216,7 @@ function RESTful() {
                     CloudCmd.log(data);
                 
                 p.callback(null, data);
-            }
+            },
         });
     }
 }

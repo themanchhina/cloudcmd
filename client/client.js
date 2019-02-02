@@ -8,19 +8,18 @@ const rendy = require('rendy/legacy');
 const exec = require('execon');
 const load = require('load.js');
 
-const {kebabToCamelCase} = require('../common/util');
+const pascalCase = require('just-pascal-case');
 const isDev = process.env.NODE_ENV === 'development';
 
 const Images = require('./dom/images');
-const {
-    unregisterSW,
-} = require('./sw/register');
+const {unregisterSW} = require('./sw/register');
 
 const jonny = require('jonny/legacy');
 const currify = require('currify/legacy');
 
 const bind = (f, ...a) => () => f(...a);
 const noop = () => {};
+const noJS = (a) => a.replace(/.js$/, '');
 
 const {
     apiURL,
@@ -54,8 +53,11 @@ function CloudCmdProto(DOM) {
     
     const CloudCmd = this;
     const Info = DOM.CurrentInfo;
-    const Storage = DOM.Storage;
-    const Files = DOM.Files;
+    
+    const {
+        Storage,
+        Files,
+    } = DOM;
     
     this.log = log;
     this.prefix = '';
@@ -96,10 +98,13 @@ function CloudCmdProto(DOM) {
         const p = params;
         
         const refresh = p.isRefresh;
-        const panel = p.panel;
-        const history = p.history;
-        const noCurrent = p.noCurrent;
-        const currentName = p.currentName;
+        
+        const {
+            panel,
+            history,
+            noCurrent,
+            currentName,
+        } = p;
         
         let panelChanged;
         if (!noCurrent)
@@ -143,7 +148,7 @@ function CloudCmdProto(DOM) {
         };
         
         CloudCmd.prefix = prefix;
-        CloudCmd.prefixURL = prefix + apiURL;
+        CloudCmd.prefixURL = `${prefix}${apiURL}`;
         CloudCmd.prefixSocket = config.prefixSocket;
         
         CloudCmd.config = (key) => config[key];
@@ -153,7 +158,7 @@ function CloudCmdProto(DOM) {
              * should be called from config.js only
              * after successful update on server
              */
-             
+            
             if (key === 'password')
                 return;
             
@@ -187,7 +192,7 @@ function CloudCmdProto(DOM) {
             return;
         
         const [kebabModule] = query;
-        const module = kebabToCamelCase(kebabModule.slice(1));
+        const module = noJS(pascalCase(kebabModule.slice(1)));
         
         const file = query[1];
         const current = DOM.getCurrentByName(file);
@@ -205,9 +210,10 @@ function CloudCmdProto(DOM) {
     this.logOut = () => {
         const url = CloudCmd.prefix + '/logout';
         const error = () => document.location.reload();
+        const {prefix} = CloudCmd;
         
         DOM.Storage.clear();
-        unregisterSW();
+        unregisterSW(prefix);
         DOM.load.ajax({
             url,
             error,
@@ -225,7 +231,7 @@ function CloudCmdProto(DOM) {
             
             loadModule({
                 path,
-                func
+                func,
             });
         });
         
@@ -267,7 +273,7 @@ function CloudCmdProto(DOM) {
                 // when hash is present
                 // it should be handled with this.route
                 // overwre otherwise
-                history: !location.hash
+                history: !location.hash,
             });
         
         const dirPath = DOM.getCurrentDirPath();
@@ -315,14 +321,14 @@ function CloudCmdProto(DOM) {
             callback = options;
             options = {};
         }
-       
+        
         const panel = options.panel || Info.panel;
         const path = DOM.getCurrentDirPath(panel);
         
         const isRefresh = true;
         const history = false;
         const noCurrent = options ? options.noCurrent : false;
-        const currentName = options.currentName;
+        const {currentName} = options;
         
         CloudCmd.loadDir({
             path,
@@ -346,11 +352,11 @@ function CloudCmdProto(DOM) {
      */
     function ajaxLoad(path, options, panel, callback) {
         const create = (error, json) => {
-            const RESTful = DOM.RESTful;
+            const {RESTful} = DOM;
             const name = options.currentName || Info.name;
             const obj = jonny.parse(json);
             const isRefresh = options.refresh;
-            const noCurrent = options.noCurrent;
+            const {noCurrent} = options;
             
             if (!isRefresh && json)
                 return createFileTable(obj, panel, options, callback);
@@ -412,7 +418,7 @@ function CloudCmdProto(DOM) {
         const names = ['file', 'path', 'link', 'pathLink'];
         
         Files.get(names, (error, templFile, templPath, templLink, templPathLink) => {
-            const Dialog = DOM.Dialog;
+            const {Dialog} = DOM;
             const panel = panelParam || DOM.getPanel();
             const {prefix} = CloudCmd;
             
@@ -424,7 +430,7 @@ function CloudCmdProto(DOM) {
             if (error)
                 return Dialog.alert(TITLE, error.responseText);
             
-            const childNodes = panel.childNodes;
+            const {childNodes} = panel;
             let i = childNodes.length;
             
             while (i--)
@@ -440,8 +446,8 @@ function CloudCmdProto(DOM) {
                     file        : templFile,
                     path        : templPath,
                     pathLink    : templPathLink,
-                    link        : templLink
-                }
+                    link        : templLink,
+                },
             });
             
             Listeners.setOnPanel(panel);
@@ -508,8 +514,8 @@ function CloudCmdProto(DOM) {
     }
     
     this.goToParentDir = () => {
-        const dir = Info.dir;
         const {
+            dir,
             dirPath,
             parentDirPath,
         } = Info;
@@ -525,7 +531,7 @@ function CloudCmdProto(DOM) {
             const first = DOM.getFiles(panel)[0];
             
             DOM.setCurrentFile(current || first, {
-                history
+                history,
             });
         });
     };

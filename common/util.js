@@ -2,9 +2,6 @@
 
 const exec = require('execon');
 
-module.exports.getStrBigFirst = getStrBigFirst;
-module.exports.kebabToCamelCase = kebabToCamelCase;
-
 module.exports.escapeRegExp = (str) => {
     const isStr = typeof str === 'string';
     
@@ -66,7 +63,7 @@ module.exports.findObjByNameInArr = (array, name) => {
         throw Error('name should be string!');
     
     array.some((item) => {
-        let is = item.name === name;
+        const is = item.name === name;
         const isArray = Array.isArray(item);
         
         if (is) {
@@ -105,24 +102,4 @@ module.exports.time = (name) => {
 module.exports.timeEnd = (name) => {
     exec.ifExist(console, 'timeEnd', [name]);
 };
-
-function getStrBigFirst(str) {
-    if (!str)
-        throw Error('str could not be empty!');
-    
-    const first = str[0].toUpperCase();
-    
-    return first + str.slice(1);
-}
-
-function kebabToCamelCase(str) {
-    if (!str)
-        throw Error('str could not be empty!');
-    
-    return str
-        .split('-')
-        .map(getStrBigFirst)
-        .join('')
-        .replace(/.js$/, '');
-}
 

@@ -17,7 +17,7 @@ const currify = require('currify');
 const wraptile = require('wraptile');
 const squad = require('squad');
 const tryToCatch = require('try-to-catch');
-const pullout = promisify(require('pullout'));
+const pullout = require('pullout');
 const ponse = require('ponse');
 const jonny = require('jonny');
 const jju = require('jju');
@@ -31,7 +31,7 @@ const save = promisify(_save);
 
 const formatMsg = currify((a, b) => CloudFunc.formatMsg(a, b));
 
-const apiURL = CloudFunc.apiURL;
+const {apiURL} = CloudFunc;
 const changeEmitter = new Emitter();
 
 const ConfigPath = path.join(DIR, 'json/config.json');
@@ -39,7 +39,7 @@ const ConfigHome = path.join(HOME, '.cloudcmd.json');
 
 const readjsonSync = (name) => {
     return jju.parse(fs.readFileSync(name, 'utf8'), {
-        mode: 'json'
+        mode: 'json',
     });
 };
 
@@ -108,7 +108,7 @@ function listen(sock, auth) {
         .on('connection', (socket) => {
             if (!manage('auth'))
                 return connection(socket);
-             
+            
             const reject = () => socket.emit('reject');
             socket.on('auth', auth(connectionWraped(socket), reject));
         });
@@ -145,7 +145,7 @@ function middle(req, res, next) {
     
     if (req.url !== `${apiURL}/config`)
         return next();
-   
+    
     switch(req.method) {
     case 'GET':
         get(req, res, next);
@@ -156,7 +156,7 @@ function middle(req, res, next) {
             return res
                 .status(404)
                 .send('Config is disabled');
-         
+        
         patch(req, res);
         break;
     
@@ -172,7 +172,7 @@ function get(request, response) {
         name    : 'config.json',
         request,
         response,
-        cache   : false
+        cache   : false,
     });
 }
 
@@ -193,7 +193,7 @@ async function patch(request, response) {
 }
 
 async function patchConfig({name, request, response, cache}) {
-    const str = await pullout(request, 'string');
+    const str = await pullout(request);
     const json = jonny.parse(str);
     
     manageConfig(json);

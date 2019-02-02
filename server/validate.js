@@ -1,5 +1,8 @@
 'use strict';
 
+const tryCatch = require('try-catch');
+
+const config = require('./config');
 const exit = require('./exit');
 const columns = require('./columns');
 
@@ -10,15 +13,17 @@ module.exports.root = (dir, fn) => {
     if (dir === '/')
         return;
     
-    const fs = require('fs');
+    if (config('dropbox'))
+        return;
     
-    fs.stat(dir, (error) => {
-        if (error)
-            return exit('cloudcmd --root: %s', error.message);
-        
-        if (typeof fn === 'function')
-            fn('root:', dir);
-    });
+    const {statSync} = require('fs');
+    const [error] = tryCatch(statSync, dir);
+    
+    if (error)
+        return exit('cloudcmd --root: %s', error.message);
+    
+    if (typeof fn === 'function')
+        fn('root:', dir);
 };
 
 module.exports.editor = (name) => {

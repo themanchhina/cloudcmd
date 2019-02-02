@@ -1,19 +1,18 @@
 'use stric';
 
-const test = require('tape');
+const test = require('supertape');
 const mockRequire = require('mock-require');
-const diff = require('sinon-called-with-diff');
-const sinon = diff(require('sinon'));
+const stub = require('@cloudcmd/stub');
 
 test('cloudcmd: client: polyfill: scrollIntoViewIfNeaded', (t) => {
     const {DOM} = global;
-    const scroll = sinon.stub();
+    const scroll = stub();
     const el = {};
     
     global.DOM = {};
     
     mockRequire('scroll-into-view-if-needed', {
-        default: scroll
+        default: scroll,
     });
     
     mockRequire.reRequire('./polyfill');

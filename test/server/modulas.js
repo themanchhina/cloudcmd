@@ -1,61 +1,57 @@
 'use strict';
 
-const path = require('path');
-const test = require('tape');
+const {join} = require('path');
+const test = require('supertape');
+const stub = require('@cloudcmd/stub');
 
-const diff = require('sinon-called-with-diff');
-const sinon = diff(require('sinon'));
-
-const {promisify} = require('es6-promisify');
-const pullout = require('pullout');
-const request = require('request');
-
-const dir = path.join(__dirname, '..', '..');
-const modulesPath = path.join(dir, 'json', 'modules.json');
+const dir = join(__dirname, '..', '..');
+const modulesPath = join(dir, 'json', 'modules.json');
+const cloudcmdPath = dir;
 
 const localModules  = require(modulesPath);
 const modulas = require(`${dir}/server/modulas`);
 
-const warp = (fn, ...a) => (...b) => fn(...b, ...a);
-const _pullout = promisify(pullout);
-
-const get = promisify((url, fn) => {
-    fn(null, request(url));
+const cloudcmd = require(cloudcmdPath);
+const {request} = require('serve-once')(cloudcmd, {
+    config: {
+        auth: false,
+        dropbox: false,
+    },
 });
-
-const getJSON = (url) => {
-    return get(url)
-        .then(warp(_pullout, 'string'))
-        .then(JSON.parse);
-};
-
-const {connect} = require('../before');
 
 test('cloudcmd: modules', async (t) => {
     const modules = {
         data: {
             FilePicker: {
-                key: 'hello'
-            }
-        }
+                key: 'hello',
+            },
+        },
+    };
+    const options = {
+        modules,
     };
     
     const expected = {
         ...localModules,
         ...modules,
     };
-    const {port, done} = await connect({modules});
-    const result = await getJSON(`http://localhost:${port}/json/modules.json`);
     
-    t.deepEqual(result, expected, 'should equal');
+    const {body} = await request.get(`/json/modules.json`, {
+        type: 'json',
+        options,
+    });
+    
+    t.deepEqual(body, expected, 'should equal');
     t.end();
-    
-    await done();
 });
 
 test('cloudcmd: modules: wrong route', async (t) => {
     const modules = {
-        hello: 'world'
+        hello: 'world',
+    };
+    
+    const options = {
+        modules,
     };
     
     const expected = {
@@ -63,19 +59,19 @@ test('cloudcmd: modules: wrong route', async (t) => {
         ...modules,
     };
     
-    const {port, done} = await connect({modules});
-    const result = await getJSON(`http://localhost:${port}/package.json`);
+    const {body} = await request.get(`/package.json`, {
+        type: 'json',
+        options,
+    });
     
-    t.notDeepEqual(result, expected, 'should not be equal');
+    t.notDeepEqual(body, expected, 'should not be equal');
     t.end();
-    
-    await done();
 });
 
 test('cloudcmd: modules: no', (t) => {
     const fn = modulas();
     const url = '/json/modules.json';
-    const send = sinon.stub();
+    const send = stub();
     
     fn({url}, {send});
     

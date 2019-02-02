@@ -1,13 +1,10 @@
 'use strict';
 
-const test = require('tape');
-const diff = require('sinon-called-with-diff');
-const sinon = diff(require('sinon'));
+const test = require('supertape');
+const {create} = require('auto-globals');
 const tryCatch = require('try-catch');
 
-const {
-    isContainClass,
-} = require('./dom-tree');
+const {isContainClass} = require('./dom-tree');
 
 test('dom: isContainClass: no element', (t) => {
     const [e] = tryCatch(isContainClass);
@@ -22,12 +19,8 @@ test('dom: isContainClass: no className', (t) => {
 });
 
 test('dom: isContainClass: contains', (t) => {
-    const contains = sinon.stub();
-    const el = {
-        classList: {
-            contains,
-        }
-    };
+    const el = create();
+    const {contains} = el.classList;
     
     const className = 'hello';
     isContainClass(el, className);
@@ -37,12 +30,8 @@ test('dom: isContainClass: contains', (t) => {
 });
 
 test('dom: isContainClass: contains: array', (t) => {
-    const contains = sinon.stub();
-    const el = {
-        classList: {
-            contains,
-        }
-    };
+    const el = create();
+    const {contains} = el.classList;
     
     const className = 'hello';
     isContainClass(el, [

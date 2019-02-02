@@ -10,13 +10,17 @@ const exec = require('execon');
 const supermenu = require('supermenu');
 
 const Info = DOM.CurrentInfo;
-const Dialog = DOM.Dialog;
-const config = CloudCmd.config;
+
+const {
+    Dialog,
+    Images,
+} = DOM;
+
+const {config} = CloudCmd;
 
 let Menu;
 
 const TITLE = 'Edit';
-const Images = DOM.Images;
 
 let MSG_CHANGED;
 const isLoading = fullstore();
@@ -25,7 +29,7 @@ const ConfigView  = {
     beforeClose: () => {
         exec.ifExist(Menu, 'hide');
         isChanged();
-    }
+    },
 };
 
 module.exports.init = async () => {
@@ -68,7 +72,7 @@ module.exports.show = (options) => {
         .setOption('keyMap', 'default');
     
     Info.getData((error, data) => {
-        const path = Info.path;
+        const {path} = Info;
         const name = getName();
         
         if (error)
@@ -114,7 +118,7 @@ function authCheck(spawn) {
 function setMenu(event) {
     const position = {
         x: event.clientX,
-        y: event.clientY
+        y: event.clientY,
     };
     
     event.preventDefault();
@@ -132,7 +136,7 @@ function setMenu(event) {
             CloudCmd.Edit
                 .getEditor()
                 .focus();
-        }
+        },
     };
     
     const element = CloudCmd.Edit.getElement();
@@ -174,7 +178,7 @@ function getMenuData() {
         },
         'Close          Esc'    : () => {
             hide();
-        }
+        },
     };
 }
 

@@ -1,12 +1,12 @@
 'use strict';
 
-const test = require('tape');
+const test = require('supertape');
 const log = require('./log');
 const config = require('../config');
 
 test('distribute: log: getMessage', (t) => {
     const e = 'hello';
-    const result = log.getMessage(e)
+    const result = log.getMessage(e);
     
     t.equal(e, result, 'should equal');
     t.end();
@@ -15,8 +15,8 @@ test('distribute: log: getMessage', (t) => {
 test('distribute: log: getMessage: message', (t) => {
     const message = 'hello';
     const result = log.getMessage({
-        message
-    })
+        message,
+    });
     
     t.equal(result, message, 'should equal');
     t.end();

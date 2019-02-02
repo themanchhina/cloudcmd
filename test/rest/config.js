@@ -3,7 +3,7 @@
 const path = require('path');
 const os = require('os');
 
-const test = require('tape');
+const test = require('supertape');
 const readjson = require('readjson');
 const writejson = require('writejson');
 
@@ -19,10 +19,11 @@ const manageConfig = require('../../server/config');
 const pathConfig = path.join(os.homedir(), '.cloudcmd.json');
 
 test('cloudcmd: rest: config: get', async (t) => {
-    const {body} = await request.get('/api/v1/config');
-    const config = JSON.parse(body);
+    const {body} = await request.get('/api/v1/config', {
+        type: 'json',
+    });
     
-    t.notOk(config.auth, 'should config.auth to be false');
+    t.notOk(body.auth, 'should config.auth to be false');
     t.end();
 });
 
@@ -33,16 +34,16 @@ test('cloudcmd: rest: config: patch', async (t) => {
     };
     
     const options = {
-        config
+        config,
     };
     
     const json = {
         auth: false,
     };
     
-    const res = await request('patch', '/api/v1/config', {
+    const res = await request.patch('/api/v1/config', {
         options,
-        body: json
+        body: json,
     });
     
     const result = res.body;
@@ -53,7 +54,7 @@ test('cloudcmd: rest: config: patch', async (t) => {
 
 test('cloudcmd: rest: config: patch: no configDialog', async (t) => {
     const config = {
-        configDialog: false
+        configDialog: false,
     };
     
     const options = {
@@ -61,7 +62,7 @@ test('cloudcmd: rest: config: patch: no configDialog', async (t) => {
     };
     
     const body = {
-        ip: null
+        ip: null,
     };
      
     const result = await request.patch(`/api/v1/config`, {
@@ -75,7 +76,7 @@ test('cloudcmd: rest: config: patch: no configDialog', async (t) => {
 
 test('cloudcmd: rest: config: patch: no configDialog: statusCode', async (t) => {
     const config = {
-        configDialog: false
+        configDialog: false,
     };
     
     const options = {

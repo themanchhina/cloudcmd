@@ -17,19 +17,18 @@ const loadParallel = promisify(load.parallel);
 const TITLE = 'Terminal';
 
 const {Dialog} = DOM;
-const {Key} = CloudCmd;
+const {
+    Key,
+    config,
+} = CloudCmd;
 
 CloudCmd.Terminal = exports;
 
 let Loaded;
 let Terminal;
 
-const {config} = CloudCmd;
-
 const loadAll = async () => {
-    const {
-        prefix,
-    } = CloudCmd;
+    const {prefix} = CloudCmd;
     
     const prefixGritty = getPrefix();
     const js = `${prefixGritty}/gritty.js`;
@@ -122,7 +121,7 @@ function show(callback) {
                 Terminal.focus();
             
             exec(callback);
-        }
+        },
     });
 }
 

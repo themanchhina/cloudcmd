@@ -1,8 +1,6 @@
 'use strict';
 
-const {promisify} = require('util');
-
-const test = require('tape');
+const test = require('supertape');
 const io = require('socket.io-client');
 
 const {connect} = require('../../test/before');
@@ -14,16 +12,15 @@ test('distribute: export', async (t) => {
         exportToken: 'a',
         vim: true,
         log: false,
+        prefix: '',
     };
     
     const {port, done} = await connect({
-        config: defaultConfig
+        config: defaultConfig,
     });
     
     const url = `http://localhost:${port}/distribute?port=${1111}`;
     const socket = io.connect(url);
-    
-    const name = config('name');
     
     socket.on('connect', () => {
         socket.emit('auth', 'a');
@@ -52,13 +49,11 @@ test('distribute: export: config', async (t) => {
     };
     
     const {port, done} = await connect({
-        config: defaultConfig
+        config: defaultConfig,
     });
     
     const url = `http://localhost:${port}/distribute?port=${1111}`;
     const socket = io.connect(url);
-    
-    const name = config('name');
     
     socket.on('connect', () => {
         socket.emit('auth', 'a');

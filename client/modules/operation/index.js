@@ -11,9 +11,7 @@ const {promisify} = require('es6-promisify');
 const exec = require('execon');
 const loadJS = require('load.js').js;
 
-const {
-    encode,
-} = require('../../../common/entity');
+const {encode} = require('../../../common/entity');
 
 const RESTful = require('../../dom/rest');
 const removeExtension = require('./remove-extension');
@@ -61,14 +59,14 @@ const noFilesCheck = () => {
     
     return is;
 };
-    
+
 module.exports.init = promisify((callback) => {
     showLoad();
     
     exec.series([
         DOM.loadSocket,
         (callback) => {
-            if (!config('progress'))
+            if (!config('progress') || config('dropbox'))
                 return callback();
             
             load(initOperations(CloudCmd.prefix, callback));
@@ -77,7 +75,7 @@ module.exports.init = promisify((callback) => {
             Loaded = true;
             Images.hide();
             callback();
-        }
+        },
     ], callback);
 });
 
@@ -181,7 +179,7 @@ Operation.copy = processFiles({
 });
 
 Operation.move = processFiles({
-    type: 'move'
+    type: 'move',
 });
 
 Operation.delete = () => {
@@ -272,8 +270,8 @@ function deleteSilent(files = DOM.getActiveFiles()) {
             const names = Info.files.map(DOM.getCurrentName);
             const isCurrent = names.includes(currentName);
             
-            let name = isCurrent ? currentName : nextCurrentName;
-           
+            const name = isCurrent ? currentName : nextCurrentName;
+            
             DOM.setCurrentByName(name);
         });
     });
@@ -285,10 +283,10 @@ function deleteSilent(files = DOM.getActiveFiles()) {
  * @param operation
  */
 function _processFiles(options, data) {
-    let selFiles, files;
+    let selFiles;
+    let files;
     let panel;
     let shouldAsk;
-    let sameName;
     let ok;
     
     let from = '';
@@ -316,7 +314,7 @@ function _processFiles(options, data) {
     
     const name = names[0];
     
-    sameName = DOM.getCurrentByName(name, panel);
+    const sameName = DOM.getCurrentByName(name, panel);
     
     if (!data && noFilesCheck())
         return;
@@ -347,7 +345,7 @@ function _processFiles(options, data) {
         
         function go() {
             showLoad();
-             
+            
             files = {
                 from,
                 to,
@@ -389,9 +387,13 @@ function twopack(operation, type) {
     let fileFrom;
     let currentName = Info.name;
     
-    const Images = DOM.Images;
-    const path = Info.path;
-    const dirPath = Info.dirPath;
+    const {Images} = DOM;
+    
+    const {
+        path,
+        dirPath,
+    } = Info;
+    
     const activeFiles = DOM.getActiveFiles();
     const names = DOM.getFilenames(activeFiles);
     
@@ -406,7 +408,7 @@ function twopack(operation, type) {
         
         fileFrom   = {
             from: path,
-            to: dirPath
+            to: dirPath,
         };
         
         currentName = removeExtension(currentName);
@@ -433,7 +435,7 @@ function twopack(operation, type) {
     
     op(fileFrom, (error) => {
         !error && CloudCmd.refresh({
-            currentName
+            currentName,
         });
     });
 }

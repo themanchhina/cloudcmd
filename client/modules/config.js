@@ -57,9 +57,10 @@ module.exports.init = async () => {
     Loading = false;
 };
 
-const config = CloudCmd.config;
-
-const {Key} = CloudCmd;
+const {
+    config,
+    Key,
+} = CloudCmd;
 
 let Element;
 let Template;
@@ -83,7 +84,7 @@ function initSocket() {
     const socket = io.connect(href + prefixSocket + '/config', {
         reconnectionAttempts: Infinity,
         reconnectionDelay: ONE_MINUTE,
-        path: prefix + '/socket.io'
+        path: prefix + '/socket.io',
     });
     
     const save = (data) => {
@@ -236,7 +237,7 @@ function onAuthChange(checked) {
 
 function onNameChange(name) {
     setTitle(getTitle({
-        name
+        name,
     }));
 }
 

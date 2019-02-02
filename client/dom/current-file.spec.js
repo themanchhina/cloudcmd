@@ -1,8 +1,8 @@
 'use strict';
 
-const test = require('tape');
-const diff = require('sinon-called-with-diff');
-const sinon = diff(require('sinon'));
+const test = require('supertape');
+const {create} = require('auto-globals');
+const stub = require('@cloudcmd/stub');
 const id = (a) => a;
 const wraptile = require('wraptile');
 const returns = wraptile(id);
@@ -19,10 +19,8 @@ test('current-file: setCurrentName: setAttribute', (t) => {
     global.DOM = getDOM();
     global.CloudCmd = getCloudCmd();
     
-    const setAttribute = sinon.stub();
-    const current = {
-        setAttribute
-    };
+    const current = create();
+    const {setAttribute} = current;
     
     currentFile.setCurrentName('hello', current);
     
@@ -43,10 +41,8 @@ test('current-file: setCurrentName: setAttribute: cyrillic', (t) => {
     global.DOM = getDOM();
     global.CloudCmd = getCloudCmd();
     
-    const setAttribute = sinon.stub();
-    const current = {
-        setAttribute
-    };
+    const current = create();
+    const {setAttribute} = current;
     
     currentFile.setCurrentName('ай', current);
     
@@ -64,17 +60,14 @@ test('current-file: emit', (t) => {
         CloudCmd,
     } = global;
     
-    const emit = sinon.stub();
-    const setAttribute = sinon.stub();
+    const emit = stub();
     
     global.DOM = getDOM();
     global.CloudCmd = getCloudCmd({
         emit,
     });
     
-    const current = {
-        setAttribute,
-    };
+    const current = create();
     
     currentFile.setCurrentName('hello', current);
     
@@ -92,18 +85,15 @@ test('current-file: setCurrentName: return', (t) => {
         CloudCmd,
     } = global;
     
-    const setAttribute = sinon.stub();
     const link = {};
     
     global.DOM = getDOM({
-        link
+        link,
     });
     
     global.CloudCmd = getCloudCmd();
     
-    const current = {
-        setAttribute,
-    };
+    const current = create();
     
     const result = currentFile.setCurrentName('hello', current);
     
@@ -116,9 +106,7 @@ test('current-file: setCurrentName: return', (t) => {
 });
 
 test('current-file: getParentDirPath: result', (t) => {
-    const {
-        DOM,
-    } = global;
+    const {DOM} = global;
     
     const getCurrentDirPath = returns('/D/Films/+++favorite films/');
     const getCurrentDirName = returns('+++favorite films');
@@ -162,10 +150,10 @@ test('current-file: isCurrentFile', (t) => {
         CloudCmd,
     } = global;
     
-    const isContainClass = sinon.stub();
+    const isContainClass = stub();
     
     global.DOM = getDOM({
-        isContainClass
+        isContainClass,
     });
     
     global.CloudCmd = getCloudCmd();
@@ -183,16 +171,16 @@ test('current-file: isCurrentFile', (t) => {
 function getCloudCmd({emit} = {}) {
     return {
         prefix: '',
-        emit: emit || sinon.stub(),
+        emit: emit || stub(),
     };
 }
 
 function getDOM({
     link = {},
-    getCurrentDirPath = sinon.stub(),
-    getCurrentDirName = sinon.stub(),
-    getByDataName = sinon.stub(),
-    isContainClass = sinon.stub(),
+    getCurrentDirPath = stub(),
+    getCurrentDirName = stub(),
+    getByDataName = stub(),
+    isContainClass = stub(),
 } = {}) {
     return {
         getCurrentDirPath,
@@ -202,7 +190,7 @@ function getDOM({
         CurrentInfo: {
             link,
             dirPath: '/',
-        }
+        },
     };
 }
 

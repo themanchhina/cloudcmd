@@ -40,14 +40,14 @@ const loadRemote = require('./load-remote');
 const selectByPattern = require('./select-by-pattern');
 
 function CmdProto() {
-    let CurrentInfo = {};
+    const CurrentInfo = {};
     
     const Cmd = this;
     const SELECTED_FILE = 'selected-file';
     const TITLE = 'Cloud Commander';
     const TabPanel = {
         'js-left'        : null,
-        'js-right'       : null
+        'js-right'       : null,
     };
     
     this.loadRemote = (name, options, callback) => {
@@ -57,7 +57,7 @@ function CmdProto() {
     
     this.loadSocket = function(callback) {
         DOM.loadRemote('socket', {
-            name    : 'io'
+            name    : 'io',
         }, callback);
         
         return DOM;
@@ -90,7 +90,7 @@ function CmdProto() {
             
             if (name === '..')
                 return '';
-             
+            
             return name;
         };
         
@@ -117,7 +117,7 @@ function CmdProto() {
                 const currentName = name;
                 
                 CloudCmd.refresh({
-                    currentName
+                    currentName,
                 });
             });
         });
@@ -247,7 +247,7 @@ function CmdProto() {
         RESTful.read(link + query, (error, size) => {
             if (error)
                 return;
-                
+            
             DOM.setCurrentSize(size, current);
             exec(callback, current);
             Images.hide();
@@ -319,7 +319,7 @@ function CmdProto() {
      */
     this.getCurrentData = (callback, currentFile) => {
         let hash;
-        const Dialog = DOM.Dialog;
+        const {Dialog} = DOM;
         const Info = DOM.CurrentInfo;
         const current = currentFile || DOM.getCurrentFile();
         const path = DOM.getCurrentPath(current);
@@ -332,7 +332,7 @@ function CmdProto() {
                 if (itype.object(data))
                     data = jonny.stringify(data);
                 
-                const length  = data.length;
+                const {length} = data;
                 
                 if (hash && length < ONE_MEGABYTE)
                     DOM.saveDataToStorage(path, data, hash);
@@ -448,7 +448,7 @@ function CmdProto() {
      */
     this.expandSelection = () => {
         const msg = 'expand';
-        const files = CurrentInfo.files;
+        const {files} = CurrentInfo;
         
         selectByPattern(msg, files);
     };
@@ -458,8 +458,8 @@ function CmdProto() {
      */
     this.shrinkSelection = () => {
         const msg = 'shrink';
-        const files = CurrentInfo.files;
-       
+        const {files} = CurrentInfo;
+        
         selectByPattern(msg, files);
     };
     
@@ -540,7 +540,7 @@ function CmdProto() {
      * check storage hash
      */
     this.checkStorageHash = (name, callback) => {
-        const parallel = exec.parallel;
+        const {parallel} = exec;
         const loadHash = DOM.loadCurrentHash;
         const nameHash = name + '-hash';
         const getStoreHash = exec.with(Storage.get, nameHash);
@@ -628,7 +628,9 @@ function CmdProto() {
      * @param options = {active: true}
      */
     this.getPanel = (options) => {
-        let files, panel, isLeft;
+        let files;
+        let panel;
+        let isLeft;
         let dataName = 'js-';
         
         const current = DOM.getCurrentFile();
@@ -656,7 +658,7 @@ function CmdProto() {
         
         if (!panel)
             throw Error('can not find Active Panel!');
-       
+        
         return panel;
     };
     
@@ -669,7 +671,7 @@ function CmdProto() {
      * shows panel right or left (or active)
      */
     this.showPanel = (active) => {
-        const panel = DOM.getPanel({active: active});
+        const panel = DOM.getPanel({active});
         
         if (!panel)
             return false;
@@ -684,7 +686,7 @@ function CmdProto() {
      */
     this.hidePanel = (active) => {
         const panel = DOM.getPanel({
-            active
+            active,
         });
         
         if (!panel)
@@ -692,7 +694,7 @@ function CmdProto() {
         
         return DOM.hide(panel);
     };
-     
+    
     /**
      * remove child of element
      * @param pChild
@@ -746,7 +748,7 @@ function CmdProto() {
      * @currentFile
      */
     this.renameCurrent = (current) => {
-        const Dialog = DOM.Dialog;
+        const {Dialog} = DOM;
         
         if (!DOM.isCurrentFile(current))
             current = DOM.getCurrentFile();
@@ -767,7 +769,7 @@ function CmdProto() {
             
             const files = {
                 from : dirPath + from,
-                to : dirPath + to
+                to : dirPath + to,
             };
             
             RESTful.mv(files, (error) => {
@@ -813,7 +815,7 @@ function CmdProto() {
         CloudCmd.emit('passive-dir', Info.dirPath);
         
         const panelPassive = DOM.getPanel({
-            active: false
+            active: false,
         });
         
         let name = DOM.getCurrentName();
@@ -822,7 +824,7 @@ function CmdProto() {
         let dataName = panel.getAttribute('data-name');
         
         TabPanel[dataName] = name;
-         
+        
         panel = panelPassive;
         dataName = panel.getAttribute('data-name');
         
@@ -846,7 +848,7 @@ function CmdProto() {
         }
         
         DOM.setCurrentFile(current, {
-            history: true
+            history: true,
         });
         
         CloudCmd.emit('active-dir', Info.dirPath);
@@ -864,10 +866,10 @@ function CmdProto() {
     this.goToDirectory = () => {
         const msg = 'Go to directory:';
         const path = CurrentInfo.dirPath;
-        const Dialog = DOM.Dialog;
+        const {Dialog} = DOM;
         const cancel = false;
         const setPath = (path) => ({
-            path
+            path,
         });
         
         Dialog.prompt(TITLE, msg, path, {cancel})
@@ -877,7 +879,7 @@ function CmdProto() {
     
     this.duplicatePanel = () => {
         const Info = CurrentInfo;
-        const isDir = Info.isDir;
+        const {isDir} = Info;
         const panel = Info.panelPassive;
         const noCurrent = !Info.isOnePanel;
         
@@ -899,11 +901,12 @@ function CmdProto() {
     
     this.swapPanels = () => {
         const Info = CurrentInfo;
-        const {panel} = Info;
-        const {files} = Info;
-        const {element} = Info;
-        
-        const panelPassive = Info.panelPassive;
+        const {
+            panel,
+            files,
+            element,
+            panelPassive,
+        } = Info;
         
         const dirPath = DOM.getCurrentDirPath();
         const dirPathPassive = DOM.getNotCurrentDirPath();
@@ -913,14 +916,14 @@ function CmdProto() {
         CloudCmd.loadDir({
             path: dirPath,
             panel: panelPassive,
-            noCurrent: true
+            noCurrent: true,
         });
         
         CloudCmd.loadDir({
             path: dirPathPassive,
-            panel: panel
+            panel,
         }, () => {
-            const files = Info.files;
+            const {files} = Info;
             const length = files.length - 1;
             
             if (currentIndex > length)
@@ -941,7 +944,7 @@ function CmdProto() {
         const panel = files.parentElement;
         
         const panelPassive = DOM.getPanel({
-            active: false
+            active: false,
         });
         
         const filesPassive = DOM.getFiles(panelPassive);

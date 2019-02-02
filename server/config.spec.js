@@ -1,23 +1,14 @@
 'use strict';
 
-const os = require('os');
-const path = require('path');
-
-const test = require('tape');
-const readjson = require('readjson');
-const diff = require('sinon-called-with-diff');
-const sinon = diff(require('sinon'));
+const test = require('supertape');
+const stub = require('@cloudcmd/stub');
 
 const root = '../';
-const dir = './';
 const configPath = './config';
 
 const config = require(configPath);
 const {_cryptoPass} = config;
 const {apiURL} = require(root + 'common/cloudfunc');
-
-const pathHomeConfig = path.join(os.homedir(), '.cloudcmd.json');
-const pathConfig = path.join(__dirname, '..', 'json', 'config.json');
 
 const fixture = require('./config.fixture');
 const {connect} = require('../test/before');
@@ -31,7 +22,7 @@ test('config: manage: get', async (t) => {
     const editor = 'deepword';
     
     const {done} = await connect({
-        config: {editor}
+        config: {editor},
     });
     
     done();
@@ -43,7 +34,7 @@ test('config: manage: get', async (t) => {
 test('config: manage: get', async (t) => {
     const editor = 'deepword';
     const conf = {
-        editor
+        editor,
     };
     
     const {done} = await connect({config: conf});
@@ -106,13 +97,13 @@ test('config: cryptoPass', (t) => {
 
 test('config: middle: no', (t) => {
     const {middle} = config;
-    const next = sinon.stub();
+    const next = stub();
     const res = null;
     const url = `${apiURL}/config`;
     const method = 'POST';
     const req = {
         url,
-        method
+        method,
     };
     
     middle(req, res, next);

@@ -40,10 +40,12 @@ const Name = 'View';
 CloudCmd[Name] = module.exports;
 
 const Info = DOM.CurrentInfo;
-const Key = CloudCmd.Key;
+const {Key} = CloudCmd;
 const basename = (a) => a.split('/').pop();
 
-let El, TemplateAudio, Overlay;
+let El;
+let TemplateAudio;
+let Overlay;
 
 const Config = {
     beforeShow: (callback) => {
@@ -111,7 +113,7 @@ function show(data, options) {
         return viewFile();
     
     case 'image':
-        return viewImage(path, prefixURL);
+        return viewImage(prefixURL);
     
     case 'media':
         return viewMedia(path);
@@ -128,8 +130,8 @@ function viewMedia(path) {
                     element
                         .querySelector('audio, video')
                         .focus();
-                }
-            }
+                },
+            },
         };
         
         modal.open(element, allConfig);
@@ -156,7 +158,7 @@ function viewFile() {
 
 function initConfig(Config, options) {
     const config = {
-        ...Config
+        ...Config,
     };
     
     if (!options)
@@ -185,7 +187,7 @@ function hide() {
     modal.close();
 }
 
-function viewImage(href, prefixURL) {
+function viewImage(prefixURL) {
     const makeTitle = (path) => {
         return {
             href: prefixURL + path,
@@ -207,8 +209,8 @@ function viewImage(href, prefixURL) {
         arrows      : true,
         keys        : true,
         helpers     : {
-            title   : {}
-        }
+            title   : {},
+        },
     };
     
     const config = {
@@ -227,7 +229,7 @@ function isImage(name) {
         'bmp',
         'webp',
         'svg',
-        'ico'
+        'ico',
     ];
     
     return images
@@ -309,9 +311,9 @@ async function loadAll() {
 function onOverlayClick(event) {
     const position = {
         x: event.clientX,
-        y: event.clientY
+        y: event.clientY,
     };
-      
+    
     setCurrentByPosition(position);
 }
 

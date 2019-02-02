@@ -30,6 +30,7 @@
     "--terminal                 ": "enable terminal",
     "--terminal-path            ": "set terminal path",
     "--terminal-command         ": "set command to run in terminal (shell by default)",
+    "--terminal-auto-restart    ": "restart command on exit",
     "--vim                      ": "enable vim hot keys",
     "--columns                  ": "set visible columns",
     "--export                   ": "enable export of config through a server",
@@ -38,6 +39,8 @@
     "--import-url               ": "url of an export server",
     "--import-token             ": "authorization token used to connect to export server",
     "--import-listen            ": "enable listen on config updates from import server",
+    "--dropbox                  ": "enable dropbox integration",
+    "--dropbox-token            ": "set dropbox token",
     "--log                      ": "enable logging",
     "--no-show-config           ": "do not show config values",
     "--no-server                ": "do not start server",
@@ -58,11 +61,14 @@
     "--no-contact               ": "disable contact",
     "--no-terminal              ": "disable terminal",
     "--no-terminal-command      ": "set default shell to run in terminal",
+    "--no-terminal-auto-restart ": "do not restart command on exit",
     "--no-vim                   ": "disable vim hot keys",
     "--no-columns               ": "set default visible columns",
     "--no-export                ": "disable export config through a server",
     "--no-import                ": "disable import of config",
     "--no-import-listen         ": "disable listen on config updates from import server",
-    "--no-log                   ": "disable logging",
-    "--no-show-file-name        ": "do not show file name in view and edit"
+    "--no-show-file-name        ": "do not show file name in view and edit",
+    "--no-dropbox               ": "disable dropbox integration",
+    "--no-dropbox-token         ": "unset dropbox token",
+    "--no-log                   ": "disable logging"
 }

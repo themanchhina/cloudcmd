@@ -4,7 +4,7 @@ const net = require('net');
 const repl = require('repl');
 
 module.exports = net.createServer((socket) => {
-    const pid = process.pid;
+    const {pid} = process;
     const addr = socket.remoteAddress;
     const port = socket.remotePort;
     
@@ -13,9 +13,9 @@ module.exports = net.createServer((socket) => {
         input: socket,
         output: socket,
         terminal: true,
-        useGlobal: false
+        useGlobal: false,
     });
-  
+    
     r.on('exit', () => {
         socket.end();
     });

@@ -1,13 +1,9 @@
 'use strict';
 
-const test = require('tape');
-const clean = require('clear-module');
-const DIR = '../../';
-const UtilPath = DIR + 'common/util';
-const Util = require(UtilPath);
+const test = require('supertape');
+const {reRequire} = require('mock-require');
+const Util = require('./util');
 const {
-    getStrBigFirst,
-    kebabToCamelCase,
     findObjByNameInArr,
     getRegExp,
     escapeRegExp,
@@ -35,26 +31,6 @@ test('util: getExt: no name', (t) => {
     const ext = Util.getExt();
     
     t.equal(ext, '', 'should return empty string');
-    t.end();
-});
-
-test('getStrBigFirst: args', (t) => {
-    t.throws(getStrBigFirst, /str could not be empty!/, 'should throw when no str');
-    t.end();
-});
-
-test('getStrBigFirst', (t) => {
-    t.equal(getStrBigFirst('hello'), 'Hello', 'should return str');
-    t.end();
-});
-
-test('kebabToCamelCase: args', (t) => {
-    t.throws(kebabToCamelCase, /str could not be empty!/, 'should throw when no str');
-    t.end();
-});
-
-test('kebabToCamelCase', (t) => {
-    t.equal(kebabToCamelCase('hello-world'), 'HelloWorld', 'should convert kebab to camel case');
     t.end();
 });
 
@@ -101,7 +77,7 @@ test('util: findObjByNameInArr: array', (t) => {
         name, [
             obj,
             item,
-        ]
+        ],
     ];
     
     const result = findObjByNameInArr(array, name);
@@ -113,7 +89,7 @@ test('util: findObjByNameInArr: array', (t) => {
 test('util: getRegExp', (t) => {
     const reg = getRegExp('hel?o.*');
     
-    t.deepEqual(reg, RegExp('^hel.?\\..*$'), 'should return regexp');
+    t.deepEqual(reg, RegExp('^hel.?o\\..*$'), 'should return regexp');
     t.end();
 });
 
@@ -136,9 +112,8 @@ test('util: escapeRegExp', (t) => {
 
 test('util: scope', (t) => {
     global.window = {};
-    clean(UtilPath);
     
-    require(UtilPath);
+    reRequire('./util');
     
     t.pass('should set window in scope');
     

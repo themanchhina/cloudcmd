@@ -37,7 +37,7 @@ module.exports = (request, response, next) => {
     if (!is)
         return next();
     
-    rest(request,response);
+    rest(request, response);
 };
 
 function rest(request, response) {
@@ -84,19 +84,18 @@ function sendData(params, callback) {
     if (isMD)
         return markdown(p.name, p.request, callback);
     
-    const method = p.request.method;
+    const {method} = p.request;
     
     switch(method) {
     case 'GET':
         return onGET(params, callback);
     
     case 'PUT':
-        return pullout(p.request, 'string', (error, body) => {
-            if (error)
-                return callback(error);
-            
-            onPUT(p.name, body, callback);
-        });
+        return pullout(p.request)
+            .then((body) => {
+                onPUT(p.name, body, callback);
+            })
+            .catch(callback);
     }
 }
 
@@ -122,7 +121,7 @@ function onGET(params, callback) {
     
     default:
         callback({
-            message: 'Not Found'
+            message: 'Not Found',
         });
         break;
     }
@@ -140,7 +139,7 @@ function streamPack(cmd, response) {
     const filename = cmd.replace(getPackReg(), '');
     const dir = path.dirname(filename);
     const names = [
-        path.basename(filename)
+        path.basename(filename),
     ];
     
     operation('pack', dir, response, names, noop);
@@ -180,7 +179,7 @@ function onPUT(name, body, callback) {
         
         const from = root(files.from);
         const to = root(files.to);
-        const names = files.names;
+        const {names} = files;
         
         if (!names)
             return fs.rename(from, to, fn);
@@ -194,7 +193,7 @@ function onPUT(name, body, callback) {
         
         if (isRootAll([files.to, files.from]))
             return callback(getWin32RootMsg());
-            
+        
         files.from  = root(files.from);
         files.to    = root(files.to);
         
@@ -231,7 +230,7 @@ function pack(from, to, names, fn) {
     
     if (!names) {
         names = [
-            path.basename(from)
+            path.basename(from),
         ];
         
         from = path.dirname(from);
@@ -265,7 +264,7 @@ function operation(op, from, to, names, fn) {
     if (!fn) {
         fn      = names;
         names   = [
-            path.basename(from)
+            path.basename(from),
         ];
     }
     

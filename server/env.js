@@ -1,6 +1,6 @@
 'use strict';
 
-const env = process.env;
+const {env} = process;
 const up = (a) => a.toUpperCase();
 
 module.exports = parse;

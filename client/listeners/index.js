@@ -11,10 +11,7 @@ const getRange = require('./get-range');
 const getIndex = currify(require('./get-index'));
 const uploadFiles = require('../dom/upload-files');
 
-const {
-    FS,
-    apiURL,
-} = require('../../common/cloudfunc');
+const {FS} = require('../../common/cloudfunc');
 
 const NBSP_REG = RegExp(String.fromCharCode(160), 'g');
 const SPACE = ' ';
@@ -52,7 +49,7 @@ const execAll = currify((funcs, event) => {
 });
 
 const Info = DOM.CurrentInfo;
-const Events = DOM.Events;
+const {Events} = DOM;
 const EventsFiles = {
     mousedown: exec.with(execIfNotUL, setCurrentFileByEvent),
     click: execAll([
@@ -116,9 +113,9 @@ module.exports.initKeysPanel = () => {
         return;
     
     Events.addClick(keysElement, ({target}) => {
-        const id = target.id;
+        const {id} = target;
         const operation = (name) => {
-            const Operation = CloudCmd.Operation;
+            const {Operation} = CloudCmd;
             const fn = Operation.show.bind(null, name);
             
             return fn;
@@ -139,7 +136,7 @@ module.exports.initKeysPanel = () => {
             'shift~'    : CloudCmd.Terminal.show,
             'contact'   : CloudCmd.Contact.show,
         };
-       
+        
         exec(clickFuncs[id]);
     });
 };
@@ -204,7 +201,7 @@ function onPathElementClick(panel, event) {
     if (attr === 'js-refresh')
         return CloudCmd.refresh({
             panel,
-            noCurrent
+            noCurrent,
         });
     
     if (attr !== 'js-path-link')
@@ -216,7 +213,7 @@ function onPathElementClick(panel, event) {
     CloudCmd.loadDir({
         path,
         isRefresh: false,
-        panel: noCurrent ? panel : Info.panel
+        panel: noCurrent ? panel : Info.panel,
     });
 }
 
@@ -274,7 +271,7 @@ function onDblClick(event) {
     
     if (isDir) {
         CloudCmd.loadDir({
-            path: path === '/' ? '/' : path + '/'
+            path: path === '/' ? '/' : path + '/',
         });
         
         event.preventDefault();
@@ -294,7 +291,7 @@ function onTouch(event) {
         return;
     
     CloudCmd.loadDir({
-        path: DOM.getCurrentPath(current)
+        path: DOM.getCurrentPath(current),
     });
 }
 
@@ -303,8 +300,9 @@ function onTouch(event) {
   * in Chrome (HTML5)
   */
 function onDragStart(event) {
+    const {prefixURL} = CloudCmd;
     const element = getLIElement(event.target);
-    const isDir = Info.isDir;
+    const {isDir} = Info;
     let link = DOM.getCurrentLink(element);
     let name = DOM.getCurrentName(element);
     
@@ -313,7 +311,7 @@ function onDragStart(event) {
         name += EXT;
         link = document.createElement('a');
         link.textContent = name;
-        link.href = apiURL + '/pack' + Info.path + EXT;
+        link.href = prefixURL + '/pack' + Info.path + EXT;
     }
     
     event.dataTransfer.setData('DownloadURL',
@@ -346,7 +344,7 @@ function setCurrentFileByEvent(event) {
         alt: event.altKey,
         ctrl: event.ctrlKey,
         meta: event.metaKey,
-        shift: event.shiftKey
+        shift: event.shiftKey,
     };
     
     const element = getLIElement(event.target);
@@ -383,7 +381,7 @@ function contextMenu() {
     Events.addOnce('contextmenu', fm, (event) => {
         CloudCmd.Menu.show({
             x: event.clientX,
-            y: event.clientY
+            y: event.clientY,
         });
     });
     
@@ -407,8 +405,11 @@ function dragndrop() {
     };
     
     const onDrop = (event) => {
-        const files = event.dataTransfer.files;
-        const items = event.dataTransfer.items;
+        const {
+            files,
+            items,
+        } = event.dataTransfer;
+        
         const {length: filesCount} = files;
         
         event.preventDefault();
@@ -434,8 +435,8 @@ function dragndrop() {
      * to upload file from download bar
      */
     const onDragOver = (event) => {
-        const dataTransfer = event.dataTransfer;
-        const effectAllowed = dataTransfer.effectAllowed;
+        const {dataTransfer} = event;
+        const {effectAllowed} = dataTransfer;
         
         if (/move|linkMove/.test(effectAllowed))
             dataTransfer.dropEffect = 'move';
@@ -456,7 +457,7 @@ function dragndrop() {
 
 function unload() {
     DOM.Events.add(['unload', 'beforeunload'], (event) => {
-        const Key = CloudCmd.Key;
+        const {Key} = CloudCmd;
         const isBind = Key && Key.isBind();
         
         if (isBind)

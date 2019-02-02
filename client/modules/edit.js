@@ -26,7 +26,7 @@ const ConfigView = {
         editor
             .moveCursorTo(0, 0)
             .focus();
-    }
+    },
 };
 
 module.exports.init = async () => {
@@ -42,7 +42,7 @@ function create() {
             'width      : 100%;'                +
             'height     : 100%;'                +
             'font-family: "Droid Sans Mono";',
-        notAppend: true
+        notAppend: true,
     });
     
     Element = element;
@@ -103,10 +103,10 @@ module.exports.hide = () => {
 };
 
 const loadFiles = async (element) => {
-    const {prefix} = CloudCmd;
-    const socketPath = prefix;
-    const {prefixSocket} = CloudCmd;
-    const url = `${prefix}/${EditorName}/${EditorName}.js`;
+    const prefix = `${CloudCmd.prefix}/${EditorName}`;
+    const socketPath = CloudCmd.prefix;
+    const prefixSocket = `${CloudCmd.prefixSocket}/${EditorName}`;
+    const url = `${prefix}/${EditorName}.js`;
     
     time(Name + ' load');
     

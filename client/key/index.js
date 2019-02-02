@@ -56,7 +56,7 @@ function KeyProto() {
     }
     
     function listener(event) {
-        const keyCode = event.keyCode;
+        const {keyCode} = event;
         const alt = event.altKey;
         const ctrl = event.ctrlKey;
         const shift = event.shiftKey;
@@ -114,18 +114,24 @@ function KeyProto() {
     }
     
     function switchKey(event) {
-        let i, isSelected, prev, next;
+        let i;
+        let isSelected;
+        let prev;
+        let next;
         let current = Info.element;
         let dataName;
         
-        const name = Info.name;
+        const {
+            name,
+            panel,
+            path,
+            isDir,
+        } = Info;
         
         const {Operation} = CloudCmd;
-        const panel = Info.panel;
-        const path = Info.path;
-        const isDir = Info.isDir;
         
-        const keyCode = event.keyCode;
+        const {keyCode} = event;
+        
         const alt = event.altKey;
         const shift = event.shiftKey;
         const ctrl = event.ctrlKey;
@@ -182,7 +188,7 @@ function KeyProto() {
         case Key.F2:
             DOM.renameCurrent(current);
             break;
-            
+        
         case Key.F3:
             if (shift)
                 CloudCmd.Markdown.show(path);
@@ -323,7 +329,7 @@ function KeyProto() {
         case Key.RIGHT:
             if (!alt)
                 return;
-           
+            
             event.preventDefault();
             
             dataName = Info.panel.getAttribute('data-name');
@@ -375,15 +381,15 @@ function KeyProto() {
             DOM.setCurrentFile(current);
             event.preventDefault();
             break;
-            
+        
         /* open directory */
         case Key.ENTER:
             if (Info.isDir)
                 CloudCmd.loadDir({
-                    path: path === '/' ? '/' : path + '/'
+                    path: path === '/' ? '/' : path + '/',
                 });
             break;
-            
+        
         case Key.BACKSPACE:
             CloudCmd.goToParentDir();
             event.preventDefault();
@@ -392,7 +398,7 @@ function KeyProto() {
         case Key.BACKSLASH:
             if (ctrlMeta)
                 CloudCmd.loadDir({
-                    path: '/'
+                    path: '/',
                 });
             break;
         
@@ -458,7 +464,7 @@ function KeyProto() {
             if (ctrlMeta)
                 Buffer.cut();
             break;
-            
+        
         case Key.V:
             if (ctrlMeta)
                 Buffer.paste();

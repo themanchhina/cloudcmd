@@ -11,7 +11,7 @@ const supermenu = require('supermenu');
 const reject = Promise.reject.bind(Promise);
 
 const Info = DOM.CurrentInfo;
-const Dialog = DOM.Dialog;
+const {Dialog} = DOM;
 
 const TITLE = 'Edit Names';
 const alert = currify(Dialog.alert, TITLE);
@@ -26,7 +26,7 @@ const ConfigView  = {
         exec.ifExist(Menu, 'hide');
         DOM.Events.remove('keydown', keyListener);
         isChanged();
-    }
+    },
 };
 
 module.exports.init = async () => {
@@ -39,7 +39,7 @@ module.exports.init = async () => {
 module.exports.show = (options) => {
     const names = getActiveNames().join('\n');
     const config = {
-        ...ConfigView, 
+        ...ConfigView,
         ...options,
     };
     
@@ -56,7 +56,7 @@ module.exports.show = (options) => {
         .disableKey();
     
     CloudCmd.Edit.show(config);
-     
+    
     return CloudCmd.Edit;
 };
 
@@ -64,7 +64,7 @@ function keyListener(event) {
     const ctrl = event.ctrlKey;
     const meta = event.metaKey;
     const ctrlMeta = ctrl || meta;
-    const Key = CloudCmd.Key;
+    const {Key} = CloudCmd;
     
     if (!ctrlMeta || event.keyCode !== Key.S)
         return;
@@ -111,7 +111,7 @@ function _refresh(to, nameIndex, res) {
     const currentName = to[nameIndex];
     
     CloudCmd.refresh({
-        currentName
+        currentName,
     });
 }
 
@@ -133,14 +133,14 @@ function _rename(path, from, to, root) {
             from,
             to,
             dir,
-        })
+        }),
     });
 }
 
 function setMenu(event) {
     const position = {
         x: event.clientX,
-        y: event.clientY
+        y: event.clientY,
     };
     
     event.preventDefault();
@@ -157,7 +157,7 @@ function setMenu(event) {
         
         afterClick: () => {
             editor.focus();
-        }
+        },
     };
     
     const menuData = {
@@ -185,7 +185,7 @@ function setMenu(event) {
         },
         'Close          Esc'    : () => {
             EditNames.hide();
-        }
+        },
     };
     
     const element = CloudCmd.Edit.getElement();

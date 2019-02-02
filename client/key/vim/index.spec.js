@@ -1,10 +1,17 @@
 'use strict';
 
-const test = require('tape');
-const diff = require('sinon-called-with-diff');
-const sinon = diff(require('sinon'));
+const {join} = require('path');
+
+const test = require('supertape');
+const stub = require('@cloudcmd/stub');
+const mockRequire = require('mock-require');
+const {reRequire} = mockRequire;
+
 const dir = '../';
-const KEY = require(dir + 'key');
+
+const pathKey = join(dir, 'key');
+const pathVim = join(dir, 'vim');
+const pathFind = join(dir, 'vim', 'find');
 
 const {
     getDOM,
@@ -14,16 +21,17 @@ const {
 global.DOM = getDOM();
 global.CloudCmd = getCloudCmd();
 
-const DOM = global.DOM;
-const Buffer = DOM.Buffer;
+const {DOM} = global;
+const {Buffer} = DOM;
 
-const vim = require(dir + 'vim');
+const KEY = require(pathKey);
+const vim = require(pathVim);
 
 test('cloudcmd: client: key: set next file: no', (t) => {
     const element = {
     };
     
-    const setCurrentFile = sinon.stub();
+    const setCurrentFile = stub();
     
     global.DOM.CurrentInfo.element = element;
     global.DOM.setCurrentFile = setCurrentFile;
@@ -31,17 +39,16 @@ test('cloudcmd: client: key: set next file: no', (t) => {
     vim('j', {});
     
     t.ok(setCurrentFile.calledWith(element), 'should set next file');
-    
     t.end();
 });
 
 test('cloudcmd: client: key: set next file current', (t) => {
     const nextSibling = 'hello';
     const element = {
-        nextSibling
+        nextSibling,
     };
     
-    const setCurrentFile = sinon.stub();
+    const setCurrentFile = stub();
     
     global.DOM.CurrentInfo.element = element;
     global.DOM.setCurrentFile = setCurrentFile;
@@ -56,10 +63,10 @@ test('cloudcmd: client: key: set next file current', (t) => {
 test('cloudcmd: client: key: set next file current', (t) => {
     const nextSibling = 'hello';
     const element = {
-        nextSibling
+        nextSibling,
     };
     
-    const setCurrentFile = sinon.stub();
+    const setCurrentFile = stub();
     
     global.DOM.CurrentInfo.element = element;
     global.DOM.setCurrentFile = setCurrentFile;
@@ -76,10 +83,10 @@ test('cloudcmd: client: key: set next file current', (t) => {
 test('cloudcmd: client: key: set next file current: g', (t) => {
     const nextSibling = 'hello';
     const element = {
-        nextSibling
+        nextSibling,
     };
     
-    const setCurrentFile = sinon.stub();
+    const setCurrentFile = stub();
     
     global.DOM.CurrentInfo.element = element;
     global.DOM.setCurrentFile = setCurrentFile;
@@ -95,13 +102,13 @@ test('cloudcmd: client: key: set next file current: g', (t) => {
 test('cloudcmd: client: key: set +2 file current', (t) => {
     const last = {};
     const nextSibling = {
-        nextSibling: last
+        nextSibling: last,
     };
     const element = {
-        nextSibling
+        nextSibling,
     };
     
-    const setCurrentFile = sinon.stub();
+    const setCurrentFile = stub();
     
     global.DOM.CurrentInfo.element = element;
     global.DOM.setCurrentFile = setCurrentFile;
@@ -119,19 +126,19 @@ test('cloudcmd: client: key: set +2 file current', (t) => {
 test('cloudcmd: client: key: select +2 files from current before delete', (t) => {
     const last = {};
     const nextSibling = {
-        nextSibling: last
+        nextSibling: last,
     };
     const element = {
-        nextSibling
+        nextSibling,
     };
     
-    const setCurrentFile = sinon.stub();
+    const setCurrentFile = stub();
     
     global.DOM.CurrentInfo.element = element;
     global.DOM.setCurrentFile = setCurrentFile;
-    global.DOM.selectFile = sinon.stub();
+    global.DOM.selectFile = stub();
     global.DOM.getCurrentName = () => false;
-    global.CloudCmd.Operation.show = sinon.stub();
+    global.CloudCmd.Operation.show = stub();
     
     const event = {};
     
@@ -147,18 +154,18 @@ test('cloudcmd: client: key: select +2 files from current before delete', (t) =>
 test('cloudcmd: client: key: delete +2 files from current', (t) => {
     const last = {};
     const nextSibling = {
-        nextSibling: last
+        nextSibling: last,
     };
     const element = {
-        nextSibling
+        nextSibling,
     };
     
-    const setCurrentFile = sinon.stub();
-    const show = sinon.stub();
+    const setCurrentFile = stub();
+    const show = stub();
     
     global.DOM.CurrentInfo.element = element;
     global.DOM.setCurrentFile = setCurrentFile;
-    global.DOM.selectFile = sinon.stub();
+    global.DOM.selectFile = stub();
     global.DOM.getCurrentName = () => false;
     global.CloudCmd.Operation.show = show;
     
@@ -176,10 +183,10 @@ test('cloudcmd: client: key: delete +2 files from current', (t) => {
 test('cloudcmd: client: key: set previous file current', (t) => {
     const previousSibling = 'hello';
     const element = {
-        previousSibling
+        previousSibling,
     };
     
-    const setCurrentFile = sinon.stub();
+    const setCurrentFile = stub();
     
     global.DOM.CurrentInfo.element = element;
     global.DOM.setCurrentFile = setCurrentFile;
@@ -192,7 +199,7 @@ test('cloudcmd: client: key: set previous file current', (t) => {
 });
 
 test('cloudcmd: client: key: copy: no', (t) => {
-    const copy = sinon.stub();
+    const copy = stub();
     
     Buffer.copy = copy;
     
@@ -204,7 +211,7 @@ test('cloudcmd: client: key: copy: no', (t) => {
 });
 
 test('cloudcmd: client: key: copy', (t) => {
-    const copy = sinon.stub();
+    const copy = stub();
     
     Buffer.copy = copy;
     
@@ -216,7 +223,7 @@ test('cloudcmd: client: key: copy', (t) => {
 });
 
 test('cloudcmd: client: key: copy: unselectFiles', (t) => {
-    const unselectFiles = sinon.stub();
+    const unselectFiles = stub();
     
     DOM.unselectFiles = unselectFiles;
     
@@ -228,7 +235,7 @@ test('cloudcmd: client: key: copy: unselectFiles', (t) => {
 });
 
 test('cloudcmd: client: key: paste', (t) => {
-    const paste = sinon.stub();
+    const paste = stub();
     
     Buffer.paste = paste;
     
@@ -240,8 +247,8 @@ test('cloudcmd: client: key: paste', (t) => {
 });
 
 test('cloudcmd: client: key: selectFile: ..', (t) => {
-    const selectFile = sinon.stub();
-    const getCurrentName = sinon.stub();
+    const selectFile = stub();
+    const getCurrentName = stub();
     
     DOM.selectFile = selectFile;
     DOM.getCurrentName = () => '..';
@@ -254,7 +261,7 @@ test('cloudcmd: client: key: selectFile: ..', (t) => {
 });
 
 test('cloudcmd: client: key: selectFile', (t) => {
-    const selectFile = sinon.stub();
+    const selectFile = stub();
     
     DOM.selectFile = selectFile;
     DOM.getCurrentName = (a) => a.name;
@@ -270,13 +277,13 @@ test('cloudcmd: client: key: selectFile', (t) => {
 test('cloudcmd: client: key: set last file current', (t) => {
     const last = 'last';
     const nextSibling = {
-        nextSibling: last
+        nextSibling: last,
     };
     const element = {
-        nextSibling
+        nextSibling,
     };
     
-    const setCurrentFile = sinon.stub();
+    const setCurrentFile = stub();
     
     global.DOM.CurrentInfo.element = element;
     global.DOM.setCurrentFile = setCurrentFile;
@@ -291,14 +298,14 @@ test('cloudcmd: client: key: set last file current', (t) => {
 test('cloudcmd: client: key: set first file current', (t) => {
     const first = 'first';
     const previousSibling= {
-        previousSibling: first
+        previousSibling: first,
     };
     
     const element = {
-        previousSibling
+        previousSibling,
     };
     
-    const setCurrentFile = sinon.stub();
+    const setCurrentFile = stub();
     
     global.DOM.CurrentInfo.element = element;
     global.DOM.setCurrentFile = setCurrentFile;
@@ -315,7 +322,7 @@ test('cloudcmd: client: key: visual', (t) => {
     const element = {
     };
     
-    const toggleSelectedFile = sinon.stub();
+    const toggleSelectedFile = stub();
     
     global.DOM.CurrentInfo.element = element;
     global.DOM.toggleSelectedFile = toggleSelectedFile;
@@ -331,13 +338,13 @@ test('cloudcmd: client: key: ESC', (t) => {
     const element = {
     };
     
-    const unselectFiles  = sinon.stub();
+    const unselectFiles = stub();
     
     global.DOM.CurrentInfo.element = element;
     global.DOM.unselectFiles = unselectFiles ;
     
     vim('', {
-        keyCode: KEY.ESC
+        keyCode: KEY.ESC,
     });
     
     t.ok(unselectFiles.calledWith(), 'should toggle selection');
@@ -348,16 +355,16 @@ test('cloudcmd: client: key: ESC', (t) => {
 test('cloudcmd: client: key: Enter', (t) => {
     const nextSibling = 'hello';
     const element = {
-        nextSibling
+        nextSibling,
     };
     
-    const setCurrentFile = sinon.stub();
+    const setCurrentFile = stub();
     
     DOM.CurrentInfo.element = element;
     DOM.setCurrentFile = setCurrentFile;
     
     vim('', {
-        keyCode: KEY.ENTER
+        keyCode: KEY.ENTER,
     });
     
     vim('j', {});
@@ -368,14 +375,14 @@ test('cloudcmd: client: key: Enter', (t) => {
 });
 
 test('cloudcmd: client: key: /', (t) => {
-    const preventDefault = sinon.stub();
+    const preventDefault = stub();
     const element = {};
     
     DOM.CurrentInfo.element = element;
     DOM.getCurrentName = () => '';
     
     vim('/', {
-        preventDefault
+        preventDefault,
     });
     
     t.ok(preventDefault.calledWith(), 'should call preventDefault');
@@ -383,44 +390,38 @@ test('cloudcmd: client: key: /', (t) => {
 });
 
 test('cloudcmd: client: key: n', (t) => {
-    const findNext = sinon.stub();
+    const findNext = stub();
     
-    clean(dir + 'vim');
-    stub(dir + 'vim/find', {
-        findNext
+    mockRequire(pathFind, {
+        findNext,
     });
     
-    const vim = require(dir + 'vim');
+    const vim = reRequire(pathVim);
     const event = {};
     
     vim('n', event);
+    
+    mockRequire.stop(pathFind);
     
     t.ok(findNext.calledWith(), 'should call findNext');
     t.end();
 });
 
 test('cloudcmd: client: key: N', (t) => {
-    const findPrevious = sinon.stub();
+    const findPrevious = stub();
     
-    clean(dir + 'vim');
-    stub(dir + 'vim/find', {
+    mockRequire(pathFind, {
         findPrevious,
     });
     
-    const vim = require(dir + 'vim');
+    const vim = reRequire(dir + 'vim');
     const event = {};
     
     vim('N', event);
     
+    mockRequire.stop(pathFind);
+    
     t.ok(findPrevious.calledWith(), 'should call findPrevious');
     t.end();
 });
-
-function clean(path) {
-    delete require.cache[require.resolve(path)];
-}
-
-function stub(name, fn) {
-    require.cache[require.resolve(name)].exports = fn;
-}
 

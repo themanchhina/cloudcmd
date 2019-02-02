@@ -94,7 +94,7 @@ function showError(name) {
     const str = 'Wrong file name: ' + name;
     const error = new Error(str);
     
-    throw(error);
+    throw error;
 }
 
 function getSystemFile(file, callback) {
@@ -107,7 +107,7 @@ function getSystemFile(file, callback) {
             load.ajax({
                 url,
                 success,
-                error
+                error,
             });
         });
     

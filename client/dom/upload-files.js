@@ -17,9 +17,7 @@ const {TITLE} = CloudCmd;
 const onEnd = wraptile(_onEnd);
 const loadFile = wraptile(_loadFile);
 
-const {
-    getCurrentDirPath: getPathWhenRootEmpty
-} = DOM;
+const {getCurrentDirPath: getPathWhenRootEmpty} = DOM;
 
 module.exports = (dir, files) => {
     if (!files) {
@@ -40,14 +38,14 @@ module.exports = (dir, files) => {
 
 function _onEnd(currentName) {
     CloudCmd.refresh({
-        currentName
+        currentName,
     });
 }
 
 function _loadFile(dir, n, file, callback) {
     let i = 0;
     
-    const name = file.name;
+    const {name} = file;
     const path = dir + name;
     const {prefixURL} = CloudCmd;
     const api = prefixURL + FS;

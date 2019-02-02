@@ -24,7 +24,7 @@ const choose = (a, b) => {
 
 process.on('unhandledRejection', exit);
 
-const argv = process.argv;
+const {argv} = process;
 const args = require('minimist')(argv.slice(2), {
     string: [
         'name',
@@ -43,6 +43,7 @@ const args = require('minimist')(argv.slice(2), {
         'import-url',
         'import-token',
         'export-token',
+        'dropbox-token',
     ],
     boolean: [
         'auth',
@@ -71,6 +72,7 @@ const args = require('minimist')(argv.slice(2), {
         'import',
         'import-listen',
         'log',
+        'dropbox',
     ],
     default: {
         server      : true,
@@ -112,6 +114,9 @@ const args = require('minimist')(argv.slice(2), {
         'keys-panel': env.bool('keys_panel') || config('keysPanel'),
         'import-token': env('import_token') || config('importToken'),
         'export-token': env('export_token') || config('exportToken'),
+        
+        'dropbox': config('dropbox'),
+        'dropbox-token': config('dropboxToken'),
     },
     alias: {
         v: 'version',
@@ -121,11 +126,11 @@ const args = require('minimist')(argv.slice(2), {
         u: 'username',
         s: 'save',
         a: 'auth',
-        c: 'config'
+        c: 'config',
     },
     unknown: (cmd) => {
         exit('\'%s\' is not a cloudcmd option. See \'cloudcmd --help\'.', cmd);
-    }
+    },
 });
 
 if (args.version)
@@ -160,7 +165,7 @@ function main() {
     config('prefix', prefixer(args.prefix));
     // MAJOR: remove condition on v12
     config('prefixSocket', prefixer(args['prefix-socket']) || config('prefix'));
-    config('root', args.root);
+    config('root', args.root || '/');
     config('vim', args.vim);
     config('columns', args.columns);
     config('log', args.log);
@@ -177,15 +182,18 @@ function main() {
     config('importListen', args['import-listen']);
     config('importUrl', args['import-url']);
     
+    config('dropbox', args['dropbox']);
+    config('dropboxToken', args['dropbox-token'] || '');
+    
     readConfig(args.config);
     
     const options = {
-        root: args.root || '/', // --no-root
-        editor: args.editor,
-        packer: args.packer,
-        prefix: args.prefix,
-        prefixSocket: args['prefix-socket'] || args.prefix, // MAJOR: remove condition on v12
-        columns: args.columns,
+        root: config('root'),
+        editor: config('editor'),
+        packer: config('packer'),
+        prefix: config('prefix'),
+        prefixSocket: config('prefixSocket') || config('prefix'), // MAJOR: remove condition on v12
+        columns: config('columns'),
     };
     
     const password = env('password') || args.password;
@@ -258,7 +266,7 @@ function readConfig(name) {
     const forEachKey = require('for-each-key');
     
     const readjsonSync = (name) => jju.parse(fs.readFileSync(name, 'utf8'), {
-        mode: 'json'
+        mode: 'json',
     });
     
     const [error, data] = tryCatch(readjsonSync, name);
@@ -297,7 +305,7 @@ function checkUpdate() {
 }
 
 function showUpdateInfo(data) {
-    const version = data.version;
+    const {version} = data;
     
     if (version === Info.version)
         return;
