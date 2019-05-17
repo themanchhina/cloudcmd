@@ -160,6 +160,7 @@ module.exports.buildFromJSON = (params) => {
     Path(path);
     
     fileTable += header + '<ul data-name="js-files" class="files">';
+    
     /* Если мы не в корне */
     if (path !== '/') {
         const dotDot = getDotDot(path);
@@ -243,7 +244,7 @@ function getSize(file) {
         type,
     } = file;
     
-    if (type === 'directory')
+    if (/^directory$/.test(type))
         return '&lt;dir&gt;';
     
     if (/link/.test(type))
@@ -253,7 +254,7 @@ function getSize(file) {
 }
 
 function _getHeaderField(sort, order, name) {
-    const arrow = order === 'asc' ?  '↑' : '↓';
+    const arrow = order === 'asc' ? '↑' : '↓';
     
     if (sort !== name)
         return name;

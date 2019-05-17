@@ -29,12 +29,13 @@ module.exports = (name, options, callback = options) => {
         
         let remoteTmpls;
         let local;
+        
         if (isArray) {
             remoteTmpls = module.remote;
-            local       = module.local;
+            local = module.local;
         } else {
-            remoteTmpls  = [module.remote];
-            local        = [module.local];
+            remoteTmpls = [module.remote];
+            local = [module.local];
         }
         
         const localURL = local.map((url) => {

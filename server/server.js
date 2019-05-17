@@ -25,7 +25,7 @@ const shutdown = wraptile(async (promises) => {
     process.exit(0);
 });
 
-const opn = require('opn');
+const opn = require('open');
 const express = require('express');
 const io = require('socket.io');
 
@@ -34,11 +34,11 @@ const logger = tryRequire('morgan');
 
 module.exports = async (options) => {
     const prefix = config('prefix');
-    const port = process.env.PORT            ||  /* c9           */
+    const port = process.env.PORT || /* c9           */
                  config('port');
     
-    const ip =  process.env.IP               ||  /* c9           */
-                config('ip')                 ||
+    const ip = process.env.IP || /* c9           */
+                config('ip') ||
                 '0.0.0.0';
     
     const app = express();

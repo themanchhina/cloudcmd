@@ -1,4 +1,5 @@
 'use strict';
+
 /* global CloudCmd, DOM */
 
 const KEY = require('../key');
@@ -13,8 +14,6 @@ const {
     findNext,
     findPrevious,
 } = require('./find');
-
-const TITLE = 'Cloud Commander';
 
 const stopVisual = () => {
     visual(false);
@@ -116,7 +115,7 @@ module.exports = (key, event) => {
     if (key === '/') {
         event.preventDefault();
         
-        Dialog.prompt(TITLE, 'Find', '', {cancel: false})
+        Dialog.prompt('Find', '', {cancel: false})
             .then(find);
         
         return end();

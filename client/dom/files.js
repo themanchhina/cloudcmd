@@ -68,7 +68,7 @@ function getModule(name, callback) {
         
         getSystemFile(path, callback);
     }
-    
+
 }
 
 function getPath(name, isHTML, isJSON) {
@@ -80,11 +80,11 @@ function getPath(name, isHTML, isJSON) {
         if (isRoot)
             path = DIR_HTML + name.replace('-tmpl', '');
         else
-            path = DIR_HTML_FS  + name;
+            path = DIR_HTML_FS + name;
         
         path += '.hbs';
     } else if (isJSON) {
-        path = DIR_JSON  + name + '.json';
+        path = DIR_JSON + name + '.json';
     }
     
     return path;
@@ -123,17 +123,12 @@ function getConfig(callback) {
     let is;
     
     if (!Promises.config)
-        Promises.config = new Promise((resolve, reject) => {
+        Promises.config = () => {
             is = true;
-            RESTful.Config.read((error, data) => {
-                if (error)
-                    return reject(error);
-                
-                resolve(data);
-            });
-        });
+            return RESTful.Config.read();
+        };
     
-    Promises.config.then((data) => {
+    Promises.config().then((data) => {
         is = false;
         
         callback(null, data);

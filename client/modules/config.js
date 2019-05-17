@@ -5,7 +5,6 @@
 require('../../css/config.css');
 
 const rendy = require('rendy/legacy');
-const exec = require('execon');
 const currify = require('currify/legacy');
 const wraptile = require('wraptile/legacy');
 const squad = require('squad/legacy');
@@ -23,7 +22,6 @@ const {Dialog, setTitle} = DOM;
 
 const Name = 'Config';
 CloudCmd[Name] = module.exports;
-const alert = currify(Dialog.alert, Name);
 
 const loadSocket = promisify(DOM.loadSocket);
 
@@ -43,7 +41,10 @@ const addChange = currify((fn, input) => {
 
 const Config = {};
 
-let Loading = true;
+let Template;
+
+const getFile = promisify(Files.get);
+const loadCSS = promisify(load.css);
 
 module.exports.init = async () => {
     if (!CloudCmd.config('configDialog'))
@@ -51,10 +52,16 @@ module.exports.init = async () => {
     
     showLoad();
     
-    await CloudCmd.View();
-    await loadSocket();
+    const {prefix} = CloudCmd;
+    
+    [Template] = await Promise.all([
+        getFile('config-tmpl'),
+        loadSocket(),
+        loadCSS(prefix + '/dist/config.css'),
+        CloudCmd.View(),
+    ]);
+    
     initSocket();
-    Loading = false;
 };
 
 const {
@@ -63,10 +70,13 @@ const {
 } = CloudCmd;
 
 let Element;
-let Template;
 
 function getHost() {
-    const {host, origin, protocol} = location;
+    const {
+        host,
+        origin,
+        protocol,
+    } = location;
     const href = origin || `${protocol}//${host}`;
     
     return href;
@@ -105,12 +115,12 @@ function initSocket() {
         Config.save = saveHttp;
     });
     
-    socket.on('err', alert);
+    socket.on('err', Dialog.alert);
 }
 
 function authCheck(socket) {
     socket.emit('auth', config('username'), config('password'));
-    socket.on('reject', wraptile(alert, 'Wrong credentials!'));
+    socket.on('reject', wraptile(Dialog.alert, 'Wrong credentials!'));
 }
 
 Config.save = saveHttp;
@@ -121,26 +131,13 @@ function show() {
     if (!CloudCmd.config('configDialog'))
         return;
     
-    const {prefix} = CloudCmd;
-    const funcs = [
-        exec.with(Files.get, 'config-tmpl'),
-        exec.with(load.css, prefix + '/dist/config.css'),
-    ];
-    
-    if (Loading)
-        return;
-    
-    showLoad();
-    exec.parallel(funcs, fillTemplate);
+    fillTemplate();
 }
 
-function fillTemplate(error, template) {
-    if (!Template)
-        Template = template;
-    
+function fillTemplate() {
     Files.get('config', (error, config) => {
         if (error)
-            return alert('Could not load config!');
+            return Dialog.alert('Could not load config!');
         
         const {
             editor,
@@ -166,6 +163,7 @@ function fillTemplate(error, template) {
         const [inputFirst] = inputs;
         
         let afterShow;
+        
         if (inputFirst) {
             onAuthChange(inputFirst.checked);
             afterShow = inputFirst.focus.bind(inputFirst);
@@ -219,10 +217,7 @@ function onSave(obj) {
 function saveHttp(obj) {
     const {RESTful} = DOM;
     
-    RESTful.Config.write(obj, (error) => {
-        if (error)
-            return;
-        
+    RESTful.Config.write(obj).then(() => {
         onSave(obj);
     });
 }
@@ -242,7 +237,7 @@ function onNameChange(name) {
 }
 
 function onKey({keyCode, target}) {
-    switch (keyCode) {
+    switch(keyCode) {
     case Key.ESC:
         return hide();
     

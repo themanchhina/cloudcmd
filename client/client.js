@@ -7,6 +7,7 @@ const inherits = require('inherits');
 const rendy = require('rendy/legacy');
 const exec = require('execon');
 const load = require('load.js');
+const {promisify} = require('es6-promisify');
 
 const pascalCase = require('just-pascal-case');
 const isDev = process.env.NODE_ENV === 'development';
@@ -66,8 +67,8 @@ function CloudCmdProto(DOM) {
     this.DIRCLIENT = '/dist/';
     this.DIRCLIENT_MODULES = this.DIRCLIENT + 'modules/';
     
-    this.MIN_ONE_PANEL_WIDTH    = 1155;
-    this.HOST                   = location.origin ||
+    this.MIN_ONE_PANEL_WIDTH = 1155;
+    this.HOST = location.origin ||
                                   location.protocol + '//' + location.host;
     
     const TITLE = 'Cloud Commander';
@@ -96,7 +97,6 @@ function CloudCmdProto(DOM) {
      */
     this.loadDir = (params, callback) => {
         const p = params;
-        
         const refresh = p.isRefresh;
         
         const {
@@ -107,6 +107,7 @@ function CloudCmdProto(DOM) {
         } = p;
         
         let panelChanged;
+        
         if (!noCurrent)
             if (panel && panel !== Info.panel) {
                 DOM.changePanel();
@@ -114,6 +115,7 @@ function CloudCmdProto(DOM) {
             }
         
         let imgPosition;
+        
         if (panelChanged || refresh || !history)
             imgPosition = 'top';
         
@@ -316,7 +318,7 @@ function CloudCmdProto(DOM) {
         func(...args);
     };
     
-    this.refresh = (options = {}, callback) => {
+    this.refresh = promisify((options = {}, callback) => {
         if (!callback && typeof options === 'function') {
             callback = options;
             options = {};
@@ -338,7 +340,7 @@ function CloudCmdProto(DOM) {
             noCurrent,
             currentName,
         }, callback);
-    };
+    });
     
     /**
      * Функция загружает json-данные о Файловой Системе
@@ -351,7 +353,7 @@ function CloudCmdProto(DOM) {
      *
      */
     function ajaxLoad(path, options, panel, callback) {
-        const create = (error, json) => {
+        const create = async (error, json) => {
             const {RESTful} = DOM;
             const name = options.currentName || Info.name;
             const obj = jonny.parse(json);
@@ -370,29 +372,27 @@ function CloudCmdProto(DOM) {
                 order,
             });
             
-            RESTful.read(path + query, 'json', (error, obj) => {
-                if (error)
-                    return;
+            const newObj = await RESTful.read(path + query, 'json');
+            
+            /* eslint require-atomic-updates:0 */
+            options.sort = sort;
+            options.order = order;
+            
+            createFileTable(newObj, panel, options, () => {
+                if (isRefresh && !noCurrent)
+                    DOM.setCurrentByName(name);
                 
-                options.sort = sort;
-                options.order = order;
-                
-                createFileTable(obj, panel, options, () => {
-                    if (isRefresh && !noCurrent)
-                        DOM.setCurrentByName(name);
-                    
-                    exec(callback);
-                });
-                
-                if (!CloudCmd.config('dirStorage'))
-                    return;
-                
-                Storage.set(path, obj);
+                exec(callback);
             });
+            
+            if (!CloudCmd.config('dirStorage'))
+                return;
+            
+            Storage.set(path, newObj);
         };
         
         if (!options)
-            options    = {};
+            options = {};
         
         CloudCmd.log('reading dir: "' + path + '";');
         
@@ -428,7 +428,7 @@ function CloudCmdProto(DOM) {
             } = Info;
             
             if (error)
-                return Dialog.alert(TITLE, error.responseText);
+                return Dialog.alert(error.responseText);
             
             const {childNodes} = panel;
             let i = childNodes.length;
@@ -459,7 +459,7 @@ function CloudCmdProto(DOM) {
                     current = DOM.getCurrentByName(dir);
                 
                 if (!current)
-                    current = DOM.getFiles(panel)[0];
+                    [current] = DOM.getFiles(panel);
                 
                 DOM.setCurrentFile(current, {
                     history,
@@ -528,7 +528,7 @@ function CloudCmdProto(DOM) {
         CloudCmd.loadDir({path}, () => {
             const {panel} = Info;
             const current = DOM.getCurrentByName(dir);
-            const first = DOM.getFiles(panel)[0];
+            const [first] = DOM.getFiles(panel);
             
             DOM.setCurrentFile(current || first, {
                 history,

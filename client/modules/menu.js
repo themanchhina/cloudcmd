@@ -24,8 +24,7 @@ const {
 } = DOM;
 
 const Info = DOM.CurrentInfo;
-const TITLE = 'Cloud Commander';
-const alertNoFiles = wrap(Dialog.alert.noFiles)(TITLE);
+const alertNoFiles = Dialog.alert.noFiles;
 const uploadTo = wrap(_uploadTo);
 
 let MenuShowedName;
@@ -37,7 +36,10 @@ module.exports.ENABLED = false;
 CloudCmd.Menu = exports;
 
 module.exports.init = () => {
-    const {isAuth, menuDataFile} = getFileMenuData();
+    const {
+        isAuth,
+        menuDataFile,
+    } = getFileMenuData();
     
     const NOT_FILE = true;
     const fm = DOM.getFM();
@@ -94,10 +96,10 @@ function getOptions(notFile) {
     let func;
     
     if (notFile) {
-        name    = 'context';
-        func    = Key.unsetBind;
+        name = 'context';
+        func = Key.unsetBind;
     } else {
-        name    = 'contextFile';
+        name = 'contextFile';
     }
     
     const options = {
@@ -241,15 +243,11 @@ function _uploadTo(nameModule) {
 function uploadFromCloud() {
     Images.show.load('top');
     
-    CloudCmd.execFromModule('Cloud', 'saveFile', (currentName, data) => {
+    CloudCmd.execFromModule('Cloud', 'saveFile', async (currentName, data) => {
         const path = DOM.getCurrentDirPath() + currentName;
         
-        RESTful.write(path,  data, (error) => {
-            if (error)
-                return;
-            
-            CloudCmd.refresh({currentName});
-        });
+        await RESTful.write(path, data);
+        await CloudCmd.refresh({currentName});
     });
 }
 
